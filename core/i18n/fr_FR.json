@@ -42,5 +42,15 @@
     "plugins\/kkasa\/plugin_info\/configuration.php": {
         "Nom d'utilisateur Kasa": "Nom d'utilisateur Kasa",
         "Mot de passe Kasa": "Mot de passe Kasa"
+    },
+    "plugins\/kkasa\/core\/class\/kkasa.class.php": {
+        "Power": "Power",
+        "State": "State",
+        "Voltage": "Voltage",
+        "Current": "Current",
+        "Consumption": "Consumption",
+        "Rafraîchir": "Rafraîchir",
+        "On": "On",
+        "Off": "Off"
     }
 }
