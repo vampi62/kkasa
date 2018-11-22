@@ -1,2 +1,2 @@
-Version initiale - 18/11/2018
+Initial version - 11/18/2018
 ===

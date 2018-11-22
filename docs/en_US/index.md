@@ -1,9 +1,8 @@
 Description
 ===
 
-Plugin permettant de piloter des objets connectés TP-Link via la plateforme
-du fabriquant : [Kasa](https://www.tp-link.com/us/kasa-smart/kasa.html).
-A ce jour, seule la prise connectée HS110 sont traités.
+This plugin allow you to manage your TP-link IoT by using the vendor platform : [Kasa](https://www.tp-link.com/us/kasa-smart/kasa.html).
+Today, only HS110 connected plug is managed
 
 Avertissements
 ===
@@ -28,36 +27,35 @@ market afin d'en faire profiter d'autres. Cependant :
     serais ravi de donner la main à d'autres contributeurs. N'hésitez pas à me
     faire signe si vous êtes intéressés.
 
-Prérequis
+Prerequisites
 ===
-Pour le moment, le plugin nécessite que vous ayez correctement installé votre
-équipement et configuré sa connexion avec Kasa (avec l'application mobile Kasa).
+For  moment, the plugin requires that you have correctly installed your
+equipment and configured its connection with Kasa (with the Kasa mobile application).
 
 
-Installation
+Setup
 ===
-Suite à l'installation et activation du plugin, rendez-vous sur la page de
-configuration pour installer les dépendances.
+After the installation and activation of the plugin, go to the page of
+configuration to install the dependencies.
 
-P.S. : pour une raison inconnue, il arrive parfois que les dépendances soient
-marquées "OK" alors qu'elles ne le sont pas. Dans le doute appuyez toujours sur
-"Relancer".
+P.S .: For obvious reasons, sometimes dependencies are
+marked "OK" when they are not. In doubt always press
+"restart".
 
-Puis renseigner vos identifiants Kasa.
+Then enter your Kasa credentials.
 
-Sauvegardez, puis rendez-vous sur la page du plugin (dans la catégorie "objets
-connectés").
+Save, then go to the plugin page (in the "home automation" category).
 
-Appuyez sur "Synchroniser avec Kasa". Une fois la synchronisation réussie, il
-vous faut actualiser la page pour voir apparaitre vos équipements.
+Tap "Synchronize with Kasa". Once the synchronization is successful, 
+you have to refresh the page to see your equipments.
 
-Et voila !
+There you go !
 
-Encore un avertissement !
+Warning
 ===
-La mise à jour des valeurs (état, puissance, consommation) se fait sur demande
-avec la commande "rafraîchir", à la sauvegarde de votre équipement, à l'appel
-d'une action (switch On/Off) et via le cron toutes les 15min.
-Cela signifie donc qu'une modification de l'état directement sur l'équipement
-ou via l'application Kasa ne sera prise en compte qu'après 15min (ou par action
-manuellement de votre part sur Jeedom).
+The update of the values ​​(state, power, consumption) is done on request
+with the "refresh" command, when saving your equipment, on the action
+execution (like switch On / Off) and by the cron every 15min.
+This means that a change of state directly on the equipment
+or via the Kasa application will only be taken into account after 15min (or by an action
+manually executed by you on Jeedom).
