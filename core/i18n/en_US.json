@@ -1,0 +1,56 @@
+{
+    "plugins\/kkasa\/desktop\/php\/kkasa.php": {
+        "Rechercher": "Search",
+        "Mes périphériques": "My devices",
+        "Gestion": "Management",
+        "Ajouter": "Add",
+        "Synchroniser avec Kasa": "Synchronize with Kasa",
+        "Configuration": "Configuration",
+        "Sauvegarder": "Save",
+        "Supprimer": "Delete",
+        "Configuration avancée": "Advanced configuration",
+        "Equipement": "Equipment",
+        "Commandes": "Commands",
+        "Nom de l'équipement": "Name of the equipment",
+        "Objet parent": "Parent object",
+        "Aucun": "None",
+        "Catégorie": "Category",
+        "Activer": "Activate",
+        "Visible": "Visible",
+        "Identifiant": "login",
+        "Type": "Type",
+        "Software version": "Firmware version",
+        "Device name": "Device Name",
+        "Model": "Model",
+        "MAC": "MAC address",
+        "Hardware ID": "Hardware ID",
+        "fwId": "FWID",
+        "OEM ID": "OEM ID",
+        "Hardware version": "Hardware Version",
+        "Nom": "Name",
+        "Options": "Options",
+        "Action": "Action"
+    },
+    "plugins\/kkasa\/desktop\/js\/kkasa.js": {
+        "Nom": "Name",
+        "Visible": "Visible",
+        "Historiser": "Logging",
+        "Tester": "Test",
+        "Synchronisation réussie": "Successful synchronization",
+        "Merci de raffraichir la page": "Please refresh the page"
+    },
+    "plugins\/kkasa\/plugin_info\/configuration.php": {
+        "Nom d'utilisateur Kasa": "Kasa Username",
+        "Mot de passe Kasa": "Kasa password"
+    },
+    "plugins\/kkasa\/core\/class\/kkasa.class.php": {
+        "Power": "Power",
+        "State": "State",
+        "Voltage": "Voltage",
+        "Current": "Current",
+        "Consumption": "Consumption",
+        "Rafraîchir": "Refresh",
+        "On": "On",
+        "Off": "Off"
+    }
+}
