@@ -278,15 +278,17 @@ class kkasa extends eqLogic {
 
     public function postSave() {
 			log::add('kkasa','debug','Processing refresh');
-			$this->addCmd('power','info','numeric','Power',1,1,'W','POWER');
 			$this->addCmd('state','info','binary','State',1,1,null,'ENERGY_STATE');
-			$this->addCmd('voltage','info','numeric','Voltage',0,0,'V','VOLTAGE');
-			$this->addCmd('current','info','numeric','Current',0,0,'A',null);
-			$this->addCmd('consumption','info','numeric','Consumption',1,1,'WH','CONSUMPTION');
 			$this->addCmd('refresh','action','other','Rafraîchir',1);
 			$this->addCmd('on','action','other','On',1,null,null,'ENERGY_ON');
 			$this->addCmd('off','action','other','Off',1,null,null,'ENERGY_OFF');
-			$this->syncRealTime();
+			if (substr($this->getConfiguration('model'),0,5) == 'HS110') {
+				$this->addCmd('power','info','numeric','Power',1,1,'W','POWER');
+				$this->addCmd('voltage','info','numeric','Voltage',0,0,'V','VOLTAGE');
+				$this->addCmd('current','info','numeric','Current',0,0,'A',null);
+				$this->addCmd('consumption','info','numeric','Consumption',1,1,'WH','CONSUMPTION');
+				$this->syncRealTime();
+			}
     }
 
     public function preUpdate() {
