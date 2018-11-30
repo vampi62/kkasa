@@ -20,8 +20,8 @@
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/Clients/KKPAApiClient.php');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
-/*error_reporting(-1);
-ini_set('display_errors', 'On');*/
+error_reporting(-1);
+ini_set('display_errors', 'On');
 
 if (!class_exists('KKPA\Clients\KKPAApiClient')) {
 	if (file_exists(TEST_FILE))
@@ -56,6 +56,20 @@ class kkasa extends eqLogic {
       }
       return self::$_client;
     }
+
+		public static function getDebugInfo() {
+			$client = self::getClient();
+  		$devicelist = $client->getDeviceList();
+  		log::add(__CLASS__, 'debug', '*** DeviceList:');
+  		log::add(__CLASS__, 'debug', print_r($client->debug_last_request(),true));
+  		foreach ($devicelist as $device) {
+				$device->getSysInfo();
+	  		log::add(__CLASS__, 'debug', '***  Device '.$device->getSysInfo()['deviceId']);
+	  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+				$device->getRealTime();
+	  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+			}
+		}
 
 		public function getDevice() {
 			if (self::$_device == null) {

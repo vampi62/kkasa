@@ -29,7 +29,10 @@ try {
   	if (init('action') == 'syncWithKasa') {
       kkasa::syncWithKasa();
       ajax::success();
-  	}
+  	} elseif(init('action') == 'debugInfo') {
+      kkasa::getDebugInfo();
+      ajax::success();
+    }
 
 
 
