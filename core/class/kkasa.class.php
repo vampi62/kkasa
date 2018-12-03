@@ -203,15 +203,30 @@ class kkasa extends eqLogic {
 						$cmd_name = 'power';
 						$value = $value/1000;
 						break;
+					case 'power':
+						$cmd_name = 'power';
+						$value = $value;
+						break;
 					case 'voltage_mv':
 						$cmd_name = 'voltage';
 						$value = $value/1000;
+						break;
+					case 'voltage':
+						$cmd_name = 'voltage';
+						$value = $value;
 						break;
 					case 'current_ma':
 						$cmd_name = 'current';
 						$value = $value/1000;
 						break;
+					case 'current':
+						$cmd_name = 'current';
+						$value = $value;
+						break;
 					case 'total_wh':
+						$cmd_name = 'consumption';
+						break;
+					case 'total':
 						$cmd_name = 'consumption';
 						break;
 					default:
