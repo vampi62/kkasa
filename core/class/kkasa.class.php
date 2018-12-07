@@ -72,14 +72,14 @@ class kkasa extends eqLogic {
 		}
 
 		public function getDevice() {
-			if (self::$_device == null) {
-        self::$_device =  new KKPA\Clients\KKPAPlugApiClient(array(
+			if ($this->$_device == null) {
+        $this->$_device =  new KKPA\Clients\KKPAPlugApiClient(array(
           'username' => config::byKey('username', 'kkasa'),
           'password' => config::byKey('password', 'kkasa'),
 					'deviceId' => $this->getLogicalId()
         ));
       }
-			return self::$_device;
+			return $this->$_device;
 		}
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
@@ -144,8 +144,9 @@ class kkasa extends eqLogic {
     public static function syncWithKasa() {
   		$client = self::getClient();
   		$devicelist = $client->getDeviceList();
-  		log::add(__CLASS__, 'debug', print_r($devicelist, true));
+  		log::add(__CLASS__, 'debug', "DeviceList retrieved:");
   		foreach ($devicelist as $device) {
+  			log::add(__CLASS__, 'debug', $device->toString());
         $sysinfo     = $device->getSysInfo();
   			$deviceId    = $sysinfo['deviceId'];
   			$alias       = $sysinfo['alias'];
