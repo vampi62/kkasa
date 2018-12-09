@@ -17,7 +17,7 @@
  */
 
 /* * ***************************Includes********************************* */
-define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/Clients/KKPAApiClient.php');
+define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 /*error_reporting(-1);
@@ -26,8 +26,7 @@ ini_set('display_errors', 'On');*/
 if (!class_exists('KKPA\Clients\KKPAApiClient')) {
 	if (file_exists(TEST_FILE))
 	{
-		require_once(dirname(__FILE__) . '/../../3rparty/KKPA/Clients/KKPAApiClient.php');
-		require_once(dirname(__FILE__) . '/../../3rparty/KKPA/Clients/KKPAPlugApiClient.php');
+		require_once(dirname(__FILE__) . '/../../3rparty/KKPA/autoload.php');
 	}
 }
 
@@ -58,16 +57,26 @@ class kkasa extends eqLogic {
     }
 
 		public static function getDebugInfo() {
+			$ex = null;
 			$client = self::getClient();
   		$devicelist = $client->getDeviceList();
   		log::add(__CLASS__, 'debug', '*** DeviceList:');
   		log::add(__CLASS__, 'debug', print_r($client->debug_last_request(),true));
   		foreach ($devicelist as $device) {
-				$device->getSysInfo();
-	  		log::add(__CLASS__, 'debug', '***  Device '.$device->getSysInfo()['deviceId']);
-	  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-				$device->getRealTime();
-	  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+				try {
+					log::add(__CLASS__, 'debug', '***  Device '.$device->getVariable('deviceId',''));
+					$device->getSysInfo();
+		  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+					$device->getRealTime();
+		  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+				} catch (KKPA\Exceptions\KKPASDKException $ex)
+				{
+					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+				}
+			}
+			if ($ex != null)
+			{
+				throw $ex;
 			}
 		}
 
@@ -144,9 +153,13 @@ class kkasa extends eqLogic {
     public static function syncWithKasa() {
   		$client = self::getClient();
   		$devicelist = $client->getDeviceList();
-  		log::add(__CLASS__, 'debug', "DeviceList retrieved:");
   		foreach ($devicelist as $device) {
-  			log::add(__CLASS__, 'debug', $device->toString());
+				if (method_exists($device,'toString')) // Retrocompatibility. To be removed after
+				{
+					log::add(__CLASS__, 'debug',$device->toString());
+				} else {
+					log::add(__CLASS__, 'debug', print_r($device, true));
+				}
         $sysinfo     = $device->getSysInfo();
   			$deviceId    = $sysinfo['deviceId'];
   			$alias       = $sysinfo['alias'];
