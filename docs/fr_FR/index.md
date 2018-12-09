@@ -61,7 +61,9 @@ Merci au préalable d'activer le niveau de log "debug" sur le plugin. Un nouveau
 
 Encore un avertissement !
 ===
-La mise à jour des valeurs (état, puissance, consommation) se fait sur demande
+* L'information "intensité" (current) semble parfois incohérentes. Cependant le plugin ne fait que remonter les informations remontées par le serveur Kasa. Il est donc plutôt conseiller se fier à l'information "puissance" (power).
+
+* La mise à jour des valeurs (état, puissance, consommation) se fait sur demande
 avec la commande "rafraîchir", à la sauvegarde de votre équipement, à l'appel
 d'une action (switch On/Off) et via le cron toutes les 15min.
 Cela signifie donc qu'une modification de l'état directement sur l'équipement
