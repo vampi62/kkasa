@@ -153,8 +153,13 @@ class kkasa extends eqLogic {
     public static function syncWithKasa() {
   		$client = self::getClient();
   		$devicelist = $client->getDeviceList();
-  		log::add(__CLASS__, 'debug', print_r($devicelist, true));
   		foreach ($devicelist as $device) {
+				if (method_exists($device,'toString')) // Retrocompatibility. To be removed after
+				{
+					log::add(__CLASS__, 'debug',$device->toString());
+				} else {
+					log::add(__CLASS__, 'debug', print_r($device, true));
+				}
         $sysinfo     = $device->getSysInfo();
   			$deviceId    = $sysinfo['deviceId'];
   			$alias       = $sysinfo['alias'];
