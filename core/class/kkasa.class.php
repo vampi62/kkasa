@@ -34,7 +34,7 @@ if (!class_exists('KKPA\Clients\KKPAApiClient')) {
 class kkasa extends eqLogic {
     /*     * *************************Attributs****************************** */
     private static $_client = null;
-    private static $_device = null;
+    private $_device = null;
 
 
     /*     * ***********************Methode static*************************** */
@@ -72,14 +72,14 @@ class kkasa extends eqLogic {
 		}
 
 		public function getDevice() {
-			if (self::$_device == null) {
-        self::$_device =  new KKPA\Clients\KKPAPlugApiClient(array(
+			if ($this->_device == null) {
+        $this->_device =  new KKPA\Clients\KKPAPlugApiClient(array(
           'username' => config::byKey('username', 'kkasa'),
           'password' => config::byKey('password', 'kkasa'),
 					'deviceId' => $this->getLogicalId()
         ));
       }
-			return self::$_device;
+			return $this->_device;
 		}
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
