@@ -18,6 +18,7 @@
 
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
+define('KKPA_MIN_VERSION','1.0');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 /*error_reporting(-1);
@@ -127,11 +128,27 @@ class kkasa extends eqLogic {
    		$return['log'] = 'kkasa_update';
    		$return['progress_file'] =  jeedom::getTmpFolder('kkasa') . '/dependancy_kkasa_in_progress';
    		if (file_exists(__DIR__.'/../../3rparty/KKPA/Clients/KKPAApiClient.php')) {
-   			$return['state'] = 'ok';
+				try {
+					$client = self::getClient();
+					if (version_compare($client->getVersion(),KKPA_MIN_VERSION,'<'))
+					{
+						log::add(__CLASS__,'error','New version of KKPA required. Please reinstall dependancies of kkasa');
+		   			$return['state'] = 'nok';
+					} else
+					{
+   					$return['state'] = 'ok';
+					}
+				}
+				catch (Exception $e)
+				{
+					log::add(__CLASS__,'error','Unable to create instance of KKPA. Please reinstall dependancies of kkasa');
+		   		$return['state'] = 'nok';
+				}
+
    		} else {
    			$return['state'] = 'nok';
    		}
-			log::add(__CLASS__ . '_update','debug','Dependancy_info: '.print_r($return,true));
+			log::add(__CLASS__,'debug','Dependancy_info: '.print_r($return,true));
    		return $return;
    	}
 
