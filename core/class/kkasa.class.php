@@ -49,7 +49,7 @@ class kkasa extends eqLogic {
       {
         self::$_client->getAccessToken();
       }
-      catch(NAClientException $ex)
+      catch(KKPA\Exceptions\KKPAClientException $ex)
       {
         $error_msg = "An error happened  while trying to retrieve your tokens \n" . $ex->getMessage() . "\n";
         log::add('kkasa', 'debug', $error_msg);
@@ -129,8 +129,7 @@ class kkasa extends eqLogic {
    		$return['progress_file'] =  jeedom::getTmpFolder('kkasa') . '/dependancy_kkasa_in_progress';
    		if (file_exists(__DIR__.'/../../3rparty/KKPA/Clients/KKPAApiClient.php')) {
 				try {
-					$client = self::getClient();
-					if (version_compare($client->getVersion(),KKPA_MIN_VERSION,'<'))
+					if (version_compare(KKPA\Clients\KKPAApiClient::getVersion(),KKPA_MIN_VERSION,'<'))
 					{
 						log::add(__CLASS__,'error','New version of KKPA required. Please reinstall dependancies of kkasa');
 		   			$return['state'] = 'nok';
@@ -141,7 +140,6 @@ class kkasa extends eqLogic {
 				}
 				catch (Exception $e)
 				{
-					log::add(__CLASS__,'error','Unable to create instance of KKPA. Please reinstall dependancies of kkasa');
 		   		$return['state'] = 'nok';
 				}
 
