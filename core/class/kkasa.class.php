@@ -33,7 +33,7 @@ if (!class_exists('KKPA\Clients\KKPAApiClient')) {
 class kkasa extends eqLogic {
     /*     * *************************Attributs****************************** */
     private static $_client = null;
-    private static $_device = null;
+    private $_device = null;
 
 
     /*     * ***********************Methode static*************************** */
@@ -81,14 +81,14 @@ class kkasa extends eqLogic {
 		}
 
 		public function getDevice() {
-			if (self::$_device == null) {
-        self::$_device =  new KKPA\Clients\KKPAPlugApiClient(array(
+			if ($this->_device == null) {
+        $this->_device =  new KKPA\Clients\KKPAPlugApiClient(array(
           'username' => config::byKey('username', 'kkasa'),
           'password' => config::byKey('password', 'kkasa'),
 					'deviceId' => $this->getLogicalId()
         ));
       }
-			return self::$_device;
+			return $this->_device;
 		}
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
@@ -113,7 +113,10 @@ class kkasa extends eqLogic {
      */
 	 public static function cron15() {
 		 foreach (self::byType('kkasa') as $kkasa) {
-			 $kkasa->syncRealTime();
+			 if ($kkasa->getIsEnable())
+			 {
+				 $kkasa->syncRealTime();
+			 }
 		 }
 	 }
 
@@ -207,6 +210,7 @@ class kkasa extends eqLogic {
 		{
 			$changed = false;
 			$device = $this->getDevice();
+			log::add('kkasa','debug','Processing refresh of '.$device->getVariable('deviceId',''));
 			$data = $device->getRealTime();
       $sysinfo = $device->getSysInfo();
 			foreach($data as $key => $value)
@@ -320,7 +324,6 @@ class kkasa extends eqLogic {
 		}
 
     public function postSave() {
-			log::add('kkasa','debug','Processing refresh');
 			$this->addCmd('state','info','binary','State',1,1,null,'ENERGY_STATE');
 			$this->addCmd('refresh','action','other','Rafraîchir',1);
 			$this->addCmd('on','action','other','On',1,null,null,'ENERGY_ON');
