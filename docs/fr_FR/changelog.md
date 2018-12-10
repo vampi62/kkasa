@@ -1,3 +1,13 @@
+Version 0.9 "Release candidate" - 11/12/2018
+===
+**Evolutions :**
+* Amélioration des messages debug
+* Vérification de la version des dépendances
+
+**Corrections :**
+* Gestion des équipements multiples
+* Délais de raffraichissement du widget
+
 Version 0.8 "Fête des lumières" - 09/12/2018
 ===
 **Evolutions :**
