@@ -272,7 +272,7 @@ class kkasa extends eqLogic {
 			} else {
 				$device->switchOff();
 			}
-			sleep(0.5);
+			sleep(1.5);
 			$this->syncRealTime();
 		}
 
