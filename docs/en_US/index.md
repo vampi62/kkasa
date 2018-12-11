@@ -1,71 +1,68 @@
 Description
 ===
 
-Plugin permettant de piloter des objets connectés TP-Link via la plateforme
-du fabriquant : [Kasa](https://www.tp-link.com/us/kasa-smart/kasa.html).
-A ce jour, seule les prises connectées HS100 et HS110 (v1&v2) sont traités.
+Plugin for controlling TP-Link connected objects via the manufacturer's platform: [Kasa](https://www.tp-link.com/us/kasa-smart/kasa.html).
+Today, only the connected plugs HS100 and HS110 (v1 & v2) are processed.
 
-Avertissements
+warnings
 ===
 
-Je n'ai pas la vocation d'assurer une maintenance long terme de ce plugin.
-Je l'ai avant tout créé pour moi-même. Une fois stable, je l'ai partagé sur le
-market afin d'en faire profiter d'autres. Cependant :
+I do not have the vocation to ensure a long-term maintenance of this plugin.
+I first created it for myself. Once stable, I shared it on the
+market to benefit others. However:
 
--   J'ai rarement le temps de me mettre sur des développements persos. Donc si
-    vous rencontrez un problème, n'hésitez pas à participer au sujet dédié
-    sur le forum ou sur les "issues" Github. Merci de regarder la section [Debug](#Debug) ci-dessous pour m'envoyer les bonnes informations.
-    Avec un peu de chance j'aurai le temps et la motivation pour
-    vous aider... mais je ne m'engage en rien.
+-   I rarely have time to put myself on personal developments. So if
+    you encounter a problem, do not hesitate to participate on the dedicated topic
+    of the forum or on "issues" Github page. Please see the [Debug] (# Debug) section below to send me the correct information.
+    Hopefully I'll have the time and motivation to
+    help you ... but I do not engage in anything.
 
--   Comme indiqué précédemment, ce plugin ne prend en charge que les prises HS100 et HS110 (v1 & v2).
-    La raison est simple : c'est tout ce que j'ai chez moi. Je serai ravi de
-    traiter d'autres périphériques... mais il faudra pour cela me les offrir ;)
-    Cependant, si vous tentez l'utilisation du plugin avec un autre matériel,
-    n'hésitez pas à m'informer sur le forum si ça fonctionne correctement ou
-    pas.
+-   As mentioned before, this plugin only supports the HS100 and HS110 (v1 & v2) plugs.
+    The reason is simple: it's all I have at home. I would be delighted to
+    to deal with other devices ... but you will have to offer them to me (thanks by advance!) ;)
+    However, if you try to use the plugin with other hardware,
+    do not hesitate to inform me on the forum if it works properly or
+    not.
 
--   Ce développement est en Open Source (AGPL) et disponible sur github. Je
-    serais ravi de donner la main à d'autres contributeurs. N'hésitez pas à me
-    faire signe si vous êtes intéressés.
+-   This development is in Open Source (AGPL) and available on github. I
+    would be happy to join other contributors. Do not hesitate to
+    notify if you are interested.
 
-Prérequis
+Prerequisites
 ===
-Pour le moment, le plugin nécessite que vous ayez correctement installé votre
-équipement et configuré sa connexion avec Kasa (avec l'application mobile Kasa).
+For the moment, the plugin requires that you have correctly installed your
+equipment and configured its connection with Kasa (with the Kasa mobile application).
 
 
-Installation
+Setup
 ===
-Suite à l'installation et activation du plugin, rendez-vous sur la page de
-configuration pour installer les dépendances.
+Following the installation and activation of the plugin, go to the page of
+configuration to install the dependencies.
 
-P.S. : pour une raison inconnue, il arrive parfois que les dépendances soient
-marquées "OK" alors qu'elles ne le sont pas. Dans le doute appuyez toujours sur
-"Relancer".
+P.S .: For some unknown reason, sometimes the dependencies are
+marked "OK" when they are not. In doubt always press
+"Reinstall".
 
-Puis renseigner vos identifiants Kasa.
+Then enter your Kasa credentials.
 
-Sauvegardez, puis rendez-vous sur la page du plugin (dans la catégorie "objets
-connectés").
+Save, then go to the plugin page (in the "connected devices" category).
 
-Appuyez sur "Synchroniser avec Kasa". Une fois la synchronisation réussie, il
-vous faut actualiser la page pour voir apparaitre vos équipements.
+Press "Synchronize with Kasa". Once the synchronization is successful, you have to refresh the page to see your equipment.
 
-Et voila !
+There you go!
 
 Debug
-=== 
-Si vous rencontrez des soucis, vous pouvez me le remonter sur les issues github ou forum jeedom.
-Merci au préalable d'activer le niveau de log "debug" sur le plugin. Un nouveau bouton "Debug Infos" apparaitra sur la page du plugin. Appuyer dessus. Reproduisez votre erreur. Puis envoyer le résultat du log kkasa.
-
-Encore un avertissement !
 ===
-* L'information "intensité" (current) semble parfois incohérentes. Cependant le plugin ne fait que remonter les informations remontées par le serveur Kasa. Il est donc plutôt conseiller se fier à l'information "puissance" (power).
+If you have problems, you can tell me on github issues or jeedom forum dedicated topic.
+Thank you in advance to activate the "debug" log level for the plugin. A new "Debug Infos" button will appear on the plugin page. Press it. Reproduce your mistake. Then send the result of the  kkasa log.
 
-* La mise à jour des valeurs (état, puissance, consommation) se fait sur demande
-avec la commande "rafraîchir", à la sauvegarde de votre équipement, à l'appel
-d'une action (switch On/Off) et via le cron toutes les 15min.
-Cela signifie donc qu'une modification de l'état directement sur l'équipement
-ou via l'application Kasa ne sera prise en compte qu'après 15min (ou par action
-manuellement de votre part sur Jeedom).
+Another warning!
+===
+* The information "current" sometimes seems inconsistent. However, the plugin only display the data as they are sent by the Kasa server. It is therefore rather adviser to trust the "power" data.
+
+* The updating of the values ​​(state, power, consumption) is done on request
+with the "refresh" command, when saving your equipment, on the call
+of an action (switch On / Off) and via the cron every 15min.
+This means that a change of state directly from physical device 
+or via the Kasa application will only be taken into account after 15min (or per manual action 
+ from you on Jeedom).
