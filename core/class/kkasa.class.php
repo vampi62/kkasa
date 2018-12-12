@@ -131,7 +131,9 @@ class kkasa extends eqLogic {
 				try {
 					if (version_compare(KKPA\Clients\KKPAApiClient::getVersion(),KKPA_MIN_VERSION,'<'))
 					{
-						log::add(__CLASS__,'error','New version of KKPA required. Please reinstall dependancies of kkasa');
+						log::add(__CLASS__,'error',
+							__('Nouvelle version des dépendance requise. Merci de réinstaller les dépendances de kkasa',__FILE__)
+						);
 		   			$return['state'] = 'nok';
 					} else
 					{
@@ -153,7 +155,10 @@ class kkasa extends eqLogic {
     public static function dependancy_install() {
   		log::remove(__CLASS__ . '_update');
       $path_3rd_party = __DIR__.'/../../3rparty/';
-  		return array('script' => __DIR__ . '/../../resources/install.sh ' . $path_3rd_party . ' ' . jeedom::getTmpFolder('kkasa'), 'log' => log::getPathToLog(__CLASS__ . '_update'));
+  		return array(
+				'script' => __DIR__ . '/../../resources/install.sh ' . $path_3rd_party . ' ' . jeedom::getTmpFolder('kkasa'),
+				'log' => log::getPathToLog(__CLASS__ . '_update')
+			);
   	}
 
 		public static function health() {
@@ -162,7 +167,7 @@ class kkasa extends eqLogic {
 			$return[] = array(
 				'test' => __('Dépendances', __FILE__),
 				'result' => strtoupper($result),
-				'advice' =>  '{{Installer les dépendance dans la configuration du plugin}}',
+				'advice' =>  __('Installer les dépendance dans la configuration du plugin',__FILE__),
 				'state' => (self::dependancy_info() == 'ok'),
 			);
 			return $return;
@@ -279,8 +284,8 @@ class kkasa extends eqLogic {
 			}
 			catch(Exception $ex)
 			{
-	  		log::add(__CLASS__, 'debug', "ERROR during request");
-	  		log::add(__CLASS__, 'debug', print_r($client->debug_last_request(),true));
+	  		log::add(__CLASS__, 'error', "ERROR during request");
+	  		log::add(__CLASS__, 'error', print_r($client->debug_last_request(),true));
 			}
 
 		}
@@ -302,8 +307,8 @@ class kkasa extends eqLogic {
 			}
 			catch(Exception $ex)
 			{
-				log::add(__CLASS__, 'debug', "ERROR during request");
-				log::add(__CLASS__, 'debug', print_r($client->debug_last_request(),true));
+				log::add(__CLASS__, 'error', "ERROR during request");
+				log::add(__CLASS__, 'error', print_r($client->debug_last_request(),true));
 			}
 		}
 
@@ -355,15 +360,15 @@ class kkasa extends eqLogic {
 		}
 
     public function postSave() {
-			$this->addCmd('state','info','binary','State',1,1,null,'ENERGY_STATE');
-			$this->addCmd('refresh','action','other','Rafraîchir',1);
-			$this->addCmd('on','action','other','On',1,null,null,'ENERGY_ON');
-			$this->addCmd('off','action','other','Off',1,null,null,'ENERGY_OFF');
+			$this->addCmd('state','info','binary',__('Etat',__FILE__),1,1,null,'ENERGY_STATE');
+			$this->addCmd('refresh','action','other',__('Rafraîchir',__FILE__),1);
+			$this->addCmd('on','action','other',__('On',__FILE__),1,null,null,'ENERGY_ON');
+			$this->addCmd('off','action','other',__('Off',__FILE__),1,null,null,'ENERGY_OFF');
 			if (substr($this->getConfiguration('model'),0,5) == 'HS110') {
-				$this->addCmd('power','info','numeric','Power',1,1,'W','POWER');
-				$this->addCmd('voltage','info','numeric','Voltage',0,0,'V','VOLTAGE');
-				$this->addCmd('current','info','numeric','Current',0,0,'A',null);
-				$this->addCmd('consumption','info','numeric','Consumption',1,1,'WH','CONSUMPTION');
+				$this->addCmd('power','info','numeric',__('Puissance',__FILE__),1,1,'W','POWER');
+				$this->addCmd('voltage','info','numeric',__('Voltage',__FILE__),0,0,'V','VOLTAGE');
+				$this->addCmd('current','info','numeric',__('Intensité',__FILE__),0,0,'A',null);
+				$this->addCmd('consumption','info','numeric',__('Consommation',__FILE__),1,1,'WH','CONSUMPTION');
 				$this->syncRealTime();
 			}
     }
