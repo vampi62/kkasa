@@ -49,7 +49,7 @@ class kkasa extends eqLogic {
       {
         self::$_client->getAccessToken();
       }
-      catch(NAClientException $ex)
+      catch(KKPA\Exceptions\KKPAClientException $ex)
       {
         $error_msg = "An error happened  while trying to retrieve your tokens \n" . $ex->getMessage() . "\n";
         log::add('kkasa', 'debug', $error_msg);
@@ -129,10 +129,11 @@ class kkasa extends eqLogic {
    		$return['progress_file'] =  jeedom::getTmpFolder('kkasa') . '/dependancy_kkasa_in_progress';
    		if (file_exists(__DIR__.'/../../3rparty/KKPA/Clients/KKPAApiClient.php')) {
 				try {
-					$client = self::getClient();
-					if (version_compare($client->getVersion(),KKPA_MIN_VERSION,'<'))
+					if (version_compare(KKPA\Clients\KKPAApiClient::getVersion(),KKPA_MIN_VERSION,'<'))
 					{
-						log::add(__CLASS__,'error','New version of KKPA required. Please reinstall dependancies of kkasa');
+						log::add(__CLASS__,'error',
+							__('Nouvelle version des dépendance requise. Merci de réinstaller les dépendances de kkasa',__FILE__)
+						);
 		   			$return['state'] = 'nok';
 					} else
 					{
@@ -141,7 +142,6 @@ class kkasa extends eqLogic {
 				}
 				catch (Exception $e)
 				{
-					log::add(__CLASS__,'error','Unable to create instance of KKPA. Please reinstall dependancies of kkasa');
 		   		$return['state'] = 'nok';
 				}
 
@@ -155,7 +155,10 @@ class kkasa extends eqLogic {
     public static function dependancy_install() {
   		log::remove(__CLASS__ . '_update');
       $path_3rd_party = __DIR__.'/../../3rparty/';
-  		return array('script' => __DIR__ . '/../../resources/install.sh ' . $path_3rd_party . ' ' . jeedom::getTmpFolder('kkasa'), 'log' => log::getPathToLog(__CLASS__ . '_update'));
+  		return array(
+				'script' => __DIR__ . '/../../resources/install.sh ' . $path_3rd_party . ' ' . jeedom::getTmpFolder('kkasa'),
+				'log' => log::getPathToLog(__CLASS__ . '_update')
+			);
   	}
 
 		public static function health() {
@@ -164,7 +167,7 @@ class kkasa extends eqLogic {
 			$return[] = array(
 				'test' => __('Dépendances', __FILE__),
 				'result' => strtoupper($result),
-				'advice' =>  '{{Installer les dépendance dans la configuration du plugin}}',
+				'advice' =>  __('Installer les dépendance dans la configuration du plugin',__FILE__),
 				'state' => (self::dependancy_info() == 'ok'),
 			);
 			return $return;
@@ -228,53 +231,61 @@ class kkasa extends eqLogic {
 			$changed = false;
 			$device = $this->getDevice();
 			log::add('kkasa','debug','Processing refresh of '.$device->getVariable('deviceId',''));
-			$data = $device->getRealTime();
-      $sysinfo = $device->getSysInfo();
-			foreach($data as $key => $value)
+			try
 			{
-				switch($key)
+				$data = $device->getRealTime();
+	      $sysinfo = $device->getSysInfo();
+				foreach($data as $key => $value)
 				{
-					case 'power_mw':
-						$cmd_name = 'power';
-						$value = $value/1000;
-						break;
-					case 'power':
-						$cmd_name = 'power';
-						$value = $value;
-						break;
-					case 'voltage_mv':
-						$cmd_name = 'voltage';
-						$value = $value/1000;
-						break;
-					case 'voltage':
-						$cmd_name = 'voltage';
-						$value = $value;
-						break;
-					case 'current_ma':
-						$cmd_name = 'current';
-						$value = $value/1000;
-						break;
-					case 'current':
-						$cmd_name = 'current';
-						$value = $value;
-						break;
-					case 'total_wh':
-						$cmd_name = 'consumption';
-						break;
-					case 'total':
-						$cmd_name = 'consumption';
-						break;
-					default:
-						$cmd_name = '';
-						continue;
+					switch($key)
+					{
+						case 'power_mw':
+							$cmd_name = 'power';
+							$value = $value/1000;
+							break;
+						case 'power':
+							$cmd_name = 'power';
+							$value = $value;
+							break;
+						case 'voltage_mv':
+							$cmd_name = 'voltage';
+							$value = $value/1000;
+							break;
+						case 'voltage':
+							$cmd_name = 'voltage';
+							$value = $value;
+							break;
+						case 'current_ma':
+							$cmd_name = 'current';
+							$value = $value/1000;
+							break;
+						case 'current':
+							$cmd_name = 'current';
+							$value = $value;
+							break;
+						case 'total_wh':
+							$cmd_name = 'consumption';
+							break;
+						case 'total':
+							$cmd_name = 'consumption';
+							break;
+						default:
+							$cmd_name = '';
+							continue;
 
+					}
+					if ($cmd_name != '')
+						$changed = $this->setInfo($cmd_name,$value) || $changed;
 				}
-				if ($cmd_name != '')
-					$changed = $this->setInfo($cmd_name,$value) || $changed;
+				$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
+				if ($changed) {
+					$this->refreshWidget();
+				}
 			}
-			$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
-			if ($changed) {
-				$this->refreshWidget();
+			catch(Exception $ex)
+			{
+	  		log::add(__CLASS__, 'error', "ERROR during request");
+	  		log::add(__CLASS__, 'error', print_r($client->debug_last_request(),true));
 			}
 
 		}
@@ -282,15 +293,23 @@ class kkasa extends eqLogic {
 		public function setState($state)
 		{
 			$device = $this->getDevice();
-			$state = boolval($state);
-			if ($state)
+			try
 			{
-				$device->switchOn();
-			} else {
-				$device->switchOff();
+				$state = boolval($state);
+				if ($state)
+				{
+					$device->switchOn();
+				} else {
+					$device->switchOff();
+				}
+				sleep(1.5);
+				$this->syncRealTime();
 			}
-			sleep(1.5);
-			$this->syncRealTime();
+			catch(Exception $ex)
+			{
+				log::add(__CLASS__, 'error', "ERROR during request");
+				log::add(__CLASS__, 'error', print_r($client->debug_last_request(),true));
+			}
 		}
 
 		public function getImgFilePath() {
@@ -341,15 +360,15 @@ class kkasa extends eqLogic {
 		}
 
     public function postSave() {
-			$this->addCmd('state','info','binary','State',1,1,null,'ENERGY_STATE');
-			$this->addCmd('refresh','action','other','Rafraîchir',1);
-			$this->addCmd('on','action','other','On',1,null,null,'ENERGY_ON');
-			$this->addCmd('off','action','other','Off',1,null,null,'ENERGY_OFF');
+			$this->addCmd('state','info','binary',__('Etat',__FILE__),1,1,null,'ENERGY_STATE');
+			$this->addCmd('refresh','action','other',__('Rafraîchir',__FILE__),1);
+			$this->addCmd('on','action','other',__('On',__FILE__),1,null,null,'ENERGY_ON');
+			$this->addCmd('off','action','other',__('Off',__FILE__),1,null,null,'ENERGY_OFF');
 			if (substr($this->getConfiguration('model'),0,5) == 'HS110') {
-				$this->addCmd('power','info','numeric','Power',1,1,'W','POWER');
-				$this->addCmd('voltage','info','numeric','Voltage',0,0,'V','VOLTAGE');
-				$this->addCmd('current','info','numeric','Current',0,0,'A',null);
-				$this->addCmd('consumption','info','numeric','Consumption',1,1,'WH','CONSUMPTION');
+				$this->addCmd('power','info','numeric',__('Puissance',__FILE__),1,1,'W','POWER');
+				$this->addCmd('voltage','info','numeric',__('Voltage',__FILE__),0,0,'V','VOLTAGE');
+				$this->addCmd('current','info','numeric',__('Intensité',__FILE__),0,0,'A',null);
+				$this->addCmd('consumption','info','numeric',__('Consommation',__FILE__),1,1,'WH','CONSUMPTION');
 				$this->syncRealTime();
 			}
     }
