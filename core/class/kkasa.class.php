@@ -21,8 +21,8 @@ define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKPA_MIN_VERSION','1.0');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
-/*error_reporting(-1);
-ini_set('display_errors', 'On');*/
+error_reporting(-1);
+ini_set('display_errors', 'On');
 
 if (!class_exists('KKPA\Clients\KKPAApiClient')) {
 	if (file_exists(TEST_FILE))
@@ -284,8 +284,9 @@ class kkasa extends eqLogic {
 			}
 			catch(Exception $ex)
 			{
-	  		log::add(__CLASS__, 'error', "ERROR during request");
-	  		log::add(__CLASS__, 'error', print_r($client->debug_last_request(),true));
+	  		log::add(__CLASS__, 'debug', "ERROR during request");
+	  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+				throw $ex;
 			}
 
 		}
@@ -307,8 +308,9 @@ class kkasa extends eqLogic {
 			}
 			catch(Exception $ex)
 			{
-				log::add(__CLASS__, 'error', "ERROR during request");
-				log::add(__CLASS__, 'error', print_r($client->debug_last_request(),true));
+				log::add(__CLASS__, 'debug', "ERROR during request");
+				log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+				throw $ex;
 			}
 		}
 
