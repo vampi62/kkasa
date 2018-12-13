@@ -29,7 +29,8 @@
         "Hardware version": "Hardware Version",
         "Nom": "Name",
         "Options": "Options",
-        "Action": "Action"
+        "Action": "Action",
+        "Debug Infos": "Debug Infos"
     },
     "plugins\/kkasa\/desktop\/js\/kkasa.js": {
         "Nom": "Name",
@@ -51,6 +52,10 @@
         "Consumption": "Consumption",
         "Rafraîchir": "Refresh",
         "On": "On",
-        "Off": "Off"
+        "Off": "Off",
+        "Etat": "Etat",
+        "Puissance": "Puissance",
+        "Intensité": "Intensité",
+        "Consommation": "Consommation"
     }
 }
