@@ -18,7 +18,7 @@
 
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
-define('KKPA_MIN_VERSION','1.0');
+define('KKPA_MIN_VERSION','1.1');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 /*error_reporting(-1);
@@ -163,13 +163,55 @@ class kkasa extends eqLogic {
 
 		public static function health() {
 			$return = array();
-			$result = self::dependancy_info(true)['state'];
+			$result = strtoupper(self::dependancy_info()['state']);
 			$return[] = array(
 				'test' => __('Dépendances', __FILE__),
-				'result' => strtoupper($result),
-				'advice' =>  __('Installer les dépendance dans la configuration du plugin',__FILE__),
-				'state' => (self::dependancy_info() == 'ok'),
+				'result' => $result,
+				'advice' => ($result == 'OK') ? '' : __('(ré)Installer les dépendance dans la configuration du plugin',__FILE__),
+				'state' => ($result == 'OK'),
 			);
+
+			try
+      {
+        $client = self::getClient();
+				$client->getAccessToken();
+				$state = true;
+      }
+      catch(KKPA\Exceptions\KKPAClientException $ex)
+      {
+				$state = false;
+      }
+			$return[] = array(
+				'test' => __('Identification Kasa', __FILE__),
+				'result' => ($state) ? "OK" : "NOK",
+				'advice' => ($state) ? '' : __('Vérifier vos identifiants Kasa dans la configuration du plugin',__FILE__),
+				'state' => $state,
+			);
+
+			$nb_offline = 0;
+			if ($state)
+			{
+  			$devicelist = $client->getDeviceList();
+	  		foreach ($devicelist as $device) {
+					try
+					{
+						$device->getRealTime();
+					}
+					catch(KKPA\Exceptions\KKPADeviceException $ex)
+					{
+						if ($ex->getCode() == KKPA_DEVICE_OFFLINE || $ex->getCode() == KKPA_TIMEOUT)
+							$nb_offline++;
+					}
+				}
+				$state = ($nb_offline == 0);
+			}
+			$return[] = array(
+				'test' => __('Prises hors ligne', __FILE__),
+				'result' => $nb_offline,
+				'advice' => ($state) ? '' : __('Vérifiez que vos prises sont connectées au wifi',__FILE__),
+				'state' => $state,
+			);
+
 			return $return;
 		}
 
