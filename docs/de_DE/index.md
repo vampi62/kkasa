@@ -57,7 +57,11 @@ Et voila !
 Debug
 === 
 Si vous rencontrez des soucis, vous pouvez me le remonter sur les issues github ou forum jeedom.
-Merci au préalable d'activer le niveau de log "debug" sur le plugin. Un nouveau bouton "Debug Infos" apparaitra sur la page du plugin. Appuyer dessus. Reproduisez votre erreur. Puis envoyer le résultat du log kkasa.
+Merci au préalable de :
+* activer le niveau de log "debug" sur le plugin. 
+* Reproduisez votre erreur.
+* Un nouveau bouton "Debug Infos" est apparu sur la page du plugin. Appuyer dessus. 
+* Puis envoyer le résultat du log kkasa.
 
 Encore un avertissement !
 ===

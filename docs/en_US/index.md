@@ -53,16 +53,20 @@ There you go!
 
 Debug
 ===
-If you have problems, you can tell me on github issues or jeedom forum dedicated topic.
-Thank you in advance to activate the "debug" log level for the plugin. A new "Debug Infos" button will appear on the plugin page. Press it. Reproduce your mistake. Then send the result of the  kkasa log.
+Si vous rencontrez des soucis, vous pouvez me le remonter sur les issues github ou forum jeedom.
+Merci au préalable de :
+* activer le niveau de log "debug" sur le plugin. 
+* Reproduisez votre erreur.
+* Un nouveau bouton "Debug Infos" est apparu sur la page du plugin. Appuyer dessus. 
+* Puis envoyer le résultat du log kkasa.
 
-Another warning!
+Encore un avertissement !
 ===
-* The information "current" sometimes seems inconsistent. However, the plugin only display the data as they are sent by the Kasa server. It is therefore rather adviser to trust the "power" data.
+* L'information "intensité" (current) semble parfois incohérentes. Cependant le plugin ne fait que remonter les informations remontées par le serveur Kasa. Il est donc plutôt conseiller se fier à l'information "puissance" (power).
 
-* The updating of the values ​​(state, power, consumption) is done on request
-with the "refresh" command, when saving your equipment, on the call
-of an action (switch On / Off) and via the cron every 15min.
-This means that a change of state directly from physical device 
-or via the Kasa application will only be taken into account after 15min (or per manual action 
- from you on Jeedom).
+* La mise à jour des valeurs (état, puissance, consommation) se fait sur demande
+avec la commande "rafraîchir", à la sauvegarde de votre équipement, à l'appel
+d'une action (switch On/Off) et via le cron toutes les 15min.
+Cela signifie donc qu'une modification de l'état directement sur l'équipement
+ou via l'application Kasa ne sera prise en compte qu'après 15min (ou par action
+manuellement de votre part sur Jeedom).

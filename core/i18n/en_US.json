@@ -56,6 +56,9 @@
         "Etat": "Etat",
         "Puissance": "Puissance",
         "Intensité": "Intensité",
-        "Consommation": "Consommation"
+        "Consommation": "Consommation",
+        "Dépendances": "Dépendances",
+        "Identification Kasa": "Identification Kasa",
+        "Prises hors ligne": "Prises hors ligne"
     }
 }

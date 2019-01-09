@@ -1,3 +1,12 @@
+Version 1.0 "Galette des rois" - 08/01/2019
+===
+**Evolutions :**
+* Passage en stable sur le market Jeedom
+* Améliorations du debug
+
+**Corrections :**
+* Correction de la page "santé"
+
 Version 0.9 "Release candidate" - 11/12/2018
 ===
 **Evolutions :**
