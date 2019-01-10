@@ -30,7 +30,7 @@
         "Nom": "Name",
         "Options": "Options",
         "Action": "Action",
-        "Debug Infos": "Debug Infos"
+        "Debug Infos": "Debug Info"
     },
     "plugins\/kkasa\/desktop\/js\/kkasa.js": {
         "Nom": "Name",
@@ -53,12 +53,12 @@
         "Rafraîchir": "Refresh",
         "On": "On",
         "Off": "Off",
-        "Etat": "Etat",
-        "Puissance": "Puissance",
-        "Intensité": "Intensité",
-        "Consommation": "Consommation",
-        "Dépendances": "Dépendances",
-        "Identification Kasa": "Identification Kasa",
-        "Prises hors ligne": "Prises hors ligne"
+        "Etat": "State",
+        "Puissance": "Power",
+        "Intensité": "Intensity",
+        "Consommation": "Consumption",
+        "Dépendances": "Dependencies",
+        "Identification Kasa": "Kasa credentials",
+        "Prises hors ligne": "Offline plugs"
     }
 }
