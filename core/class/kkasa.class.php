@@ -270,65 +270,72 @@ class kkasa extends eqLogic {
 
 		public function syncRealTime()
 		{
+			$attempt = 0;
+			$success = false;
 			$changed = false;
 			$device = $this->getDevice();
 			log::add('kkasa','debug','Processing refresh of '.$device->getVariable('deviceId',''));
-			try
+			while((!$success) && $attempt < 3)
 			{
-				$data = $device->getRealTime();
-	      $sysinfo = $device->getSysInfo();
-				foreach($data as $key => $value)
+				try
 				{
-					switch($key)
+					$data = $device->getRealTime();
+		      $sysinfo = $device->getSysInfo();
+					$success = true;
+					foreach($data as $key => $value)
 					{
-						case 'power_mw':
-							$cmd_name = 'power';
-							$value = $value/1000;
-							break;
-						case 'power':
-							$cmd_name = 'power';
-							$value = $value;
-							break;
-						case 'voltage_mv':
-							$cmd_name = 'voltage';
-							$value = $value/1000;
-							break;
-						case 'voltage':
-							$cmd_name = 'voltage';
-							$value = $value;
-							break;
-						case 'current_ma':
-							$cmd_name = 'current';
-							$value = $value/1000;
-							break;
-						case 'current':
-							$cmd_name = 'current';
-							$value = $value;
-							break;
-						case 'total_wh':
-							$cmd_name = 'consumption';
-							break;
-						case 'total':
-							$cmd_name = 'consumption';
-							break;
-						default:
-							$cmd_name = '';
-							continue;
+						switch($key)
+						{
+							case 'power_mw':
+								$cmd_name = 'power';
+								$value = $value/1000;
+								break;
+							case 'power':
+								$cmd_name = 'power';
+								$value = $value;
+								break;
+							case 'voltage_mv':
+								$cmd_name = 'voltage';
+								$value = $value/1000;
+								break;
+							case 'voltage':
+								$cmd_name = 'voltage';
+								$value = $value;
+								break;
+							case 'current_ma':
+								$cmd_name = 'current';
+								$value = $value/1000;
+								break;
+							case 'current':
+								$cmd_name = 'current';
+								$value = $value;
+								break;
+							case 'total_wh':
+								$cmd_name = 'consumption';
+								break;
+							case 'total':
+								$cmd_name = 'consumption';
+								break;
+							default:
+								$cmd_name = '';
+								continue;
 
+						}
+						if ($cmd_name != '')
+							$changed = $this->setInfo($cmd_name,$value) || $changed;
 					}
-					if ($cmd_name != '')
-						$changed = $this->setInfo($cmd_name,$value) || $changed;
+					$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
+					if ($changed) {
+						$this->refreshWidget();
+					}
 				}
-				$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
-				if ($changed) {
-					$this->refreshWidget();
+				catch(Exception $ex)
+				{
+					$attempt++;
+		  		log::add(__CLASS__, 'debug', "ERROR during request - attempt #" . $attempt . "/3");
+		  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+					if ($attempt>2) throw $ex;
 				}
-			}
-			catch(Exception $ex)
-			{
-	  		log::add(__CLASS__, 'debug', "ERROR during request");
-	  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-				throw $ex;
 			}
 
 		}
@@ -336,23 +343,30 @@ class kkasa extends eqLogic {
 		public function setState($state)
 		{
 			$device = $this->getDevice();
-			try
+			$success = false;
+			$attempt = 0;
+			while ((!$success) && $attempt < 3)
 			{
-				$state = boolval($state);
-				if ($state)
+				try
 				{
-					$device->switchOn();
-				} else {
-					$device->switchOff();
+					$state = boolval($state);
+					if ($state)
+					{
+						$device->switchOn();
+					} else {
+						$device->switchOff();
+					}
+					sleep(1.5);
+					$this->syncRealTime();
+					$success = true;
 				}
-				sleep(1.5);
-				$this->syncRealTime();
-			}
-			catch(Exception $ex)
-			{
-				log::add(__CLASS__, 'debug', "ERROR during request");
-				log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-				throw $ex;
+				catch(Exception $ex)
+				{
+					$attempt++;
+					log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
+					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+					if ($attempt > 2) throw $ex;
+				}
 			}
 		}
 
