@@ -21,8 +21,8 @@ define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKPA_MIN_VERSION','1.1');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
-/*error_reporting(-1);
-ini_set('display_errors', 'On');*/
+error_reporting(-1);
+ini_set('display_errors', 'On');
 
 if (!class_exists('KKPA\Clients\KKPAApiClient')) {
 	if (file_exists(TEST_FILE))
@@ -90,6 +90,10 @@ class kkasa extends eqLogic {
         ));
       }
 			return $this->_device;
+		}
+
+		public function isPowerAvailable() {
+			return (substr($this->getConfiguration('model'),0,5) == 'HS110');
 		}
     /*
      * Fonction exécutée automatiquement toutes les minutes par Jeedom
@@ -279,52 +283,57 @@ class kkasa extends eqLogic {
 			{
 				try
 				{
-					$data = $device->getRealTime();
 		      $sysinfo = $device->getSysInfo();
-					$success = true;
-					foreach($data as $key => $value)
-					{
-						switch($key)
-						{
-							case 'power_mw':
-								$cmd_name = 'power';
-								$value = $value/1000;
-								break;
-							case 'power':
-								$cmd_name = 'power';
-								$value = $value;
-								break;
-							case 'voltage_mv':
-								$cmd_name = 'voltage';
-								$value = $value/1000;
-								break;
-							case 'voltage':
-								$cmd_name = 'voltage';
-								$value = $value;
-								break;
-							case 'current_ma':
-								$cmd_name = 'current';
-								$value = $value/1000;
-								break;
-							case 'current':
-								$cmd_name = 'current';
-								$value = $value;
-								break;
-							case 'total_wh':
-								$cmd_name = 'consumption';
-								break;
-							case 'total':
-								$cmd_name = 'consumption';
-								break;
-							default:
-								$cmd_name = '';
-								continue;
-
-						}
-						if ($cmd_name != '')
-							$changed = $this->setInfo($cmd_name,$value) || $changed;
-					}
 					$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
+
+					if ($this->isPowerAvailable())
+					{
+						$data = $device->getRealTime();
+						foreach($data as $key => $value)
+						{
+							switch($key)
+							{
+								case 'power_mw':
+									$cmd_name = 'power';
+									$value = $value/1000;
+									break;
+								case 'power':
+									$cmd_name = 'power';
+									$value = $value;
+									break;
+								case 'voltage_mv':
+									$cmd_name = 'voltage';
+									$value = $value/1000;
+									break;
+								case 'voltage':
+									$cmd_name = 'voltage';
+									$value = $value;
+									break;
+								case 'current_ma':
+									$cmd_name = 'current';
+									$value = $value/1000;
+									break;
+								case 'current':
+									$cmd_name = 'current';
+									$value = $value;
+									break;
+								case 'total_wh':
+									$cmd_name = 'consumption';
+									break;
+								case 'total':
+									$cmd_name = 'consumption';
+									break;
+								default:
+									$cmd_name = '';
+									continue;
+
+							}
+							if ($cmd_name != '')
+								$changed = $this->setInfo($cmd_name,$value) || $changed;
+						}
+					}
+					$success = true;
+
 					if ($changed) {
 						$this->refreshWidget();
 					}
@@ -422,13 +431,13 @@ class kkasa extends eqLogic {
 			$this->addCmd('refresh','action','other',__('Rafraîchir',__FILE__),1);
 			$this->addCmd('on','action','other',__('On',__FILE__),1,null,null,'ENERGY_ON');
 			$this->addCmd('off','action','other',__('Off',__FILE__),1,null,null,'ENERGY_OFF');
-			if (substr($this->getConfiguration('model'),0,5) == 'HS110') {
+			if ($this->isPowerAvailable()) {
 				$this->addCmd('power','info','numeric',__('Puissance',__FILE__),1,1,'W','POWER');
 				$this->addCmd('voltage','info','numeric',__('Voltage',__FILE__),0,0,'V','VOLTAGE');
 				$this->addCmd('current','info','numeric',__('Intensité',__FILE__),0,0,'A',null);
 				$this->addCmd('consumption','info','numeric',__('Consommation',__FILE__),1,1,'WH','CONSUMPTION');
-				$this->syncRealTime();
 			}
+			$this->syncRealTime();
     }
 
     public function preUpdate() {
