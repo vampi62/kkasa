@@ -95,28 +95,51 @@ class kkasa extends eqLogic {
 		public function isPowerAvailable() {
 			return (substr($this->getConfiguration('model'),0,5) == 'HS110');
 		}
-    /*
-     * Fonction exécutée automatiquement toutes les minutes par Jeedom
-      public static function cron() {
 
-      }
-     */
+    public static function cron() {
+ 		 if (strval(config::byKey('cron_freq','kkasa','15'))=='1')
+ 		 		self::cronExec();
+    }
 
+		public static function cron5() {
+ 		 if (strval(config::byKey('cron_freq','kkasa','15'))=='5')
+ 		 		self::cronExec();
+    }
 
-    /*
-     * Fonction exécutée automatiquement toutes les heures par Jeedom
-      public static function cronHourly() {
-
-      }
-     */
-
-    /*
-     * Fonction exécutée automatiquement tous les jours par Jeedom
-      public static function cronDaily() {
-
-      }
-     */
 	 public static function cron15() {
+		 if (strval(config::byKey('cron_freq','kkasa','15'))=='15')
+		 		self::cronExec();
+	 }
+
+	public static function cron30() {
+		if (strval(config::byKey('cron_freq','kkasa','15'))=='30')
+			 self::cronExec();
+	}
+
+    public static function cronHourly() {
+ 		 if (strval(config::byKey('cron_freq','kkasa','15'))=='60')
+ 		 		self::cronExec();
+    }
+
+		public static function cronDaily() {
+ 		 if (config::byKey('cron_freq','kkasa','15')=='3600')
+ 		 		self::cronExec();
+
+		 // Once a day: update the firmware version
+ 		 foreach (self::byType('kkasa') as $kkasa) {
+ 			 if ($kkasa->getIsEnable())
+ 			 {
+				 	$device = $this->getDevice();
+ 					$sysinfo = $device->getSysInfo();
+ 					$kkasa->setConfiguration('sw_ver', $sysinfo['sw_ver']);
+ 					$kkasa->setConfiguration('fwId', $sysinfo['fwId']);
+ 					$kkasa->setConfiguration('oemId', $sysinfo['oemId']);
+ 					$kkasa->save();
+ 			 }
+ 		 }
+		}
+
+	 public static function cronExec() {
 		 foreach (self::byType('kkasa') as $kkasa) {
 			 if ($kkasa->getIsEnable())
 			 {
@@ -124,7 +147,6 @@ class kkasa extends eqLogic {
 			 }
 		 }
 	 }
-
 
    public static function dependancy_info() {
 		  log::add(__CLASS__ . '_update','debug','Checking dependancy');
@@ -262,6 +284,7 @@ class kkasa extends eqLogic {
 					$eqLogic->setConfiguration('fwId', $fwId);
 					$eqLogic->setConfiguration('oemId', $oemId);
 					$eqLogic->setConfiguration('hw_ver', $deviceHwVer);
+					$eqLogic->setConfiguration('cron_freq', 15);
 
   				$eqLogic->setEqType_name('kkasa');
   				$eqLogic->setIsVisible(1);
@@ -285,6 +308,9 @@ class kkasa extends eqLogic {
 				{
 		      $sysinfo = $device->getSysInfo();
 					$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
+					$this->setConfiguration('sw_ver', $sysinfo['sw_ver']);
+					$this->setConfiguration('fwId', $sysinfo['fwId']);
+					$this->setConfiguration('oemId', $sysinfo['oemId']);
 
 					if ($this->isPowerAvailable())
 					{

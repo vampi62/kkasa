@@ -19,11 +19,14 @@
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
 function kkasa_install() {
-
+  config::save('cron_freq', '15','kkasa');
 }
 
 function kkasa_update() {
-
+  if (config::byKey('cron_freq', 'kkasa','-1')=='-1')
+  {
+    config::save('cron_freq', '15','kkasa');
+  }
 }
 
 

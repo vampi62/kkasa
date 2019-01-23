@@ -36,5 +36,19 @@ if (!isConnect()) {
                 <input type="password" class="configKey form-control" data-l1key="password" />
             </div>
         </div>
+      	<div class="form-group">
+            <label class="col-sm-4 control-label">{{Fréquence de raffraîchissement auto}}</label>
+            <div class="col-lg-2">
+    						<select class="form-control configKey" data-l1key="cron_freq">
+    							<option value="0">{{Aucun}}</option>
+    							<option value="1">1 {{min}}</option>
+    							<option value="5">5 {{min}}</option>
+    							<option value="15">15 {{min}}</option>
+    							<option value="30">30 {{min}}</option>
+    							<option value="60">1 {{Heure}}</option>
+    							<option value="3600">1 {{jour}}</option>
+    						</select>
+            </div>
+        </div>
   </fieldset>
 </form>
