@@ -39,20 +39,22 @@ Setup
 Following the installation and activation of the plugin, go to the page of
 configuration to install the dependencies.
 
-P.S .: For some unknown reason, sometimes the dependencies are
-marked "OK" when they are not. In doubt always press
-"Reinstall".
+Puis renseigner vos identifiants Kasa et sélectionnez la fréquence de rafraîchissement désirée.
 
-Then enter your Kasa credentials.
+**Attention :** je n'ai aucune information sur une éventuelle limite du nombre de requêtes de l'API Kasa, mais si elle existe il se pourrait que TP-Link bloque vos requêtes jugées trop fréquentes et considérées comme abusives.
+Pour le moment, je me suis limité à une fréquence de rafraîchissement de 15min dans mes tests sans soucis.
 
-Save, then go to the plugin page (in the "connected devices" category).
+Vous restez donc responsable de votre utilisation, du choix de ce paramètre et des conséquences éventuelles que cela impliquerait.
 
-Press "Synchronize with Kasa". Once the synchronization is successful, you have to refresh the page to see your equipment.
+Sauvegardez, puis rendez-vous sur la page du plugin (dans la catégorie "objets
+connectés").
 
-There you go!
+Appuyez sur "Synchroniser avec Kasa" et vous devriez voir apparaitre vos équipements.
+
+Et voila !
 
 Debug
-===
+=== 
 Si vous rencontrez des soucis, vous pouvez me le remonter sur les issues github ou forum jeedom.
 Merci au préalable de :
 * activer le niveau de log "debug" sur le plugin. 
@@ -62,11 +64,13 @@ Merci au préalable de :
 
 Encore un avertissement !
 ===
-* L'information "intensité" (current) semble parfois incohérentes. Cependant le plugin ne fait que remonter les informations remontées par le serveur Kasa. Il est donc plutôt conseiller se fier à l'information "puissance" (power).
+* Les possesseurs de HS110 ont peut-être remarqué que la puissance n'était pas toujours égale au produit du voltage et de l'intensité. La raison se trouve dans la différence entre puissance active et apparente.
+
+Plus d'information sur la [page wikipedia](https://fr.wikipedia.org/wiki/Puissance_en_r%C3%A9gime_alternatif) ou ce [petit dessin animé très bien fichu](https://www.youtube.com/watch?v=IURKavCBUkE).
 
 * La mise à jour des valeurs (état, puissance, consommation) se fait sur demande
 avec la commande "rafraîchir", à la sauvegarde de votre équipement, à l'appel
-d'une action (switch On/Off) et via le cron toutes les 15min.
+d'une action (switch On/Off) et via le cron en fonction de la fréquence que vous avez paramétré.
 Cela signifie donc qu'une modification de l'état directement sur l'équipement
-ou via l'application Kasa ne sera prise en compte qu'après 15min (ou par action
+ou via l'application Kasa ne sera prise en compte qu'après votre délais de rafraîchissement (ou par action
 manuellement de votre part sur Jeedom).
