@@ -244,6 +244,7 @@ class kkasa extends eqLogic {
     public static function syncWithKasa() {
   		$client = self::getClient();
   		$devicelist = $client->getDeviceList();
+			$nb_devices = 0;
   		foreach ($devicelist as $device) {
 				if (method_exists($device,'toString')) // Retrocompatibility. To be removed after
 				{
@@ -251,48 +252,64 @@ class kkasa extends eqLogic {
 				} else {
 					log::add(__CLASS__, 'debug', print_r($device, true));
 				}
-        $sysinfo     = $device->getSysInfo();
-  			$deviceId    = $sysinfo['deviceId'];
-  			$alias       = $sysinfo['alias'];
-  			$type  			 = $sysinfo['type'];
-				$fwVer			 = $sysinfo['sw_ver'];
-				$deviceName	 = $sysinfo['dev_name'];
-				$deviceModel = $sysinfo['model'];
-				$deviceMac	 = $sysinfo['mac'];
-				$hwId				 = $sysinfo['hwId'];
-				$fwId				 = $sysinfo['fwId'];
-				$oemId			 = $sysinfo['oemId'];
-				$deviceHwVer = $sysinfo['hw_ver'];
+				try
+				{
+	        $sysinfo     = $device->getSysInfo();
+	  			$deviceId    = $sysinfo['deviceId'];
+	  			$alias       = $sysinfo['alias'];
+	  			$type  			 = $sysinfo['type'];
+					$fwVer			 = $sysinfo['sw_ver'];
+					$deviceName	 = $sysinfo['dev_name'];
+					$deviceModel = $sysinfo['model'];
+					$deviceMac	 = $sysinfo['mac'];
+					$hwId				 = $sysinfo['hwId'];
+					$fwId				 = $sysinfo['fwId'];
+					$oemId			 = $sysinfo['oemId'];
+					$deviceHwVer = $sysinfo['hw_ver'];
 
-  			$eqLogic = kkasa::byLogicalId($deviceId, 'kkasa');
-  			if (!is_object($eqLogic)) {
-  				$eqLogic = new self();
-                  foreach (object::all() as $object) {
-                      if (stristr($alias,$object->getName())){
-                          $eqLogic->setObject_id($object->getId());
-                          break;
-                      }
-                  }
-  				$eqLogic->setLogicalId($deviceId);
-  				$eqLogic->setName($alias);
-					$eqLogic->setConfiguration('type', $type);
-					$eqLogic->setConfiguration('sw_ver', $fwVer);
-					$eqLogic->setConfiguration('dev_name', $deviceName);
-					$eqLogic->setConfiguration('model', $deviceModel);
-					$eqLogic->setConfiguration('mac', $deviceMac);
-					$eqLogic->setConfiguration('hwId', $hwId);
-					$eqLogic->setConfiguration('fwId', $fwId);
-					$eqLogic->setConfiguration('oemId', $oemId);
-					$eqLogic->setConfiguration('hw_ver', $deviceHwVer);
-					$eqLogic->setConfiguration('cron_freq', 15);
+	  			$eqLogic = kkasa::byLogicalId($deviceId, 'kkasa');
+	  			if (!is_object($eqLogic)) {
+	  				$eqLogic = new self();
+	                  foreach (object::all() as $object) {
+	                      if (stristr($alias,$object->getName())){
+	                          $eqLogic->setObject_id($object->getId());
+	                          break;
+	                      }
+	                  }
+	  				$eqLogic->setLogicalId($deviceId);
+	  				$eqLogic->setName($alias);
+						$eqLogic->setConfiguration('type', $type);
+						$eqLogic->setConfiguration('sw_ver', $fwVer);
+						$eqLogic->setConfiguration('dev_name', $deviceName);
+						$eqLogic->setConfiguration('model', $deviceModel);
+						$eqLogic->setConfiguration('mac', $deviceMac);
+						$eqLogic->setConfiguration('hwId', $hwId);
+						$eqLogic->setConfiguration('fwId', $fwId);
+						$eqLogic->setConfiguration('oemId', $oemId);
+						$eqLogic->setConfiguration('hw_ver', $deviceHwVer);
+						$eqLogic->setConfiguration('cron_freq', 15);
 
-  				$eqLogic->setEqType_name('kkasa');
-  				$eqLogic->setIsVisible(1);
-  				$eqLogic->setIsEnable(1);
-  				$eqLogic->save();
-  			}
-				$eqLogic->refreshWidget();
-  		}
+	  				$eqLogic->setEqType_name('kkasa');
+	  				$eqLogic->setIsVisible(1);
+	  				$eqLogic->setIsEnable(1);
+	  				$eqLogic->save();
+	  			}
+					$nb_devices++;
+					$eqLogic->refreshWidget();
+				} catch(KKPA\Exceptions\KKPADeviceException $ex)
+				{
+					if ($ex->getCode() == KKPA_DEVICE_OFFLINE || $ex->getCode() == KKPA_TIMEOUT)
+					{
+						log::add(__CLASS__, 'warning',
+							sprintf(
+								__('Equipement %s trouvé mais injoignable. Ignoré',__FILE__),
+								$device->getVariable('deviceId','')
+							)
+						);
+					}
+				}
+	  	}
+			return $nb_devices;
   	}
 
 		public function syncRealTime()
