@@ -65,7 +65,8 @@
         "Dépendances": "Dépendances",
         "Identification Kasa": "Identification Kasa",
         "Prises hors ligne": "Prises hors ligne",
-        "Equipement %s trouvé mais injoignable. Ignoré": "Equipement %s trouvé mais injoignable. Ignoré"
+        "Equipement %s trouvé mais injoignable. Ignoré": "Equipement %s trouvé mais injoignable. Ignoré",
+        "Force signal": "Force signal"
     },
     "plugins\/kkasa\/core\/ajax\/kkasa.ajax.php": {
         "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa": "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa"

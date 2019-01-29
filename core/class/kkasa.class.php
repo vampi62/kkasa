@@ -18,7 +18,7 @@
 
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
-define('KKPA_MIN_VERSION','1.1');
+define('KKPA_MIN_VERSION','1.2');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
 /*error_reporting(-1);
@@ -325,6 +325,7 @@ class kkasa extends eqLogic {
 				{
 		      $sysinfo = $device->getSysInfo();
 					$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
+					$changed = $this->setInfo('rssi',$sysinfo['rssi']) || $changed;
 					$this->setConfiguration('sw_ver', $sysinfo['sw_ver']);
 					$this->setConfiguration('fwId', $sysinfo['fwId']);
 					$this->setConfiguration('oemId', $sysinfo['oemId']);
@@ -474,6 +475,7 @@ class kkasa extends eqLogic {
 			$this->addCmd('refresh','action','other',__('Rafraîchir',__FILE__),1);
 			$this->addCmd('on','action','other',__('On',__FILE__),1,null,null,'ENERGY_ON');
 			$this->addCmd('off','action','other',__('Off',__FILE__),1,null,null,'ENERGY_OFF');
+			$this->addCmd('rssi','info','numeric',__('Force signal',__FILE__),0,1,'dBm');
 			if ($this->isPowerAvailable()) {
 				$this->addCmd('power','info','numeric',__('Puissance',__FILE__),1,1,'W','POWER');
 				$this->addCmd('voltage','info','numeric',__('Voltage',__FILE__),0,0,'V','VOLTAGE');
