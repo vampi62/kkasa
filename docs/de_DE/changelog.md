@@ -1,3 +1,14 @@
+Version 1.1 "St Valentin" - 14/02/2019 (date planifiée)
+===
+**Evolutions :**
+* Plusieurs tentatives avant échec de la requête
+* Gestion des fréquences de rafraîchissement auto
+* Rafraîchissement de page automatique après synchro Kasa
+
+**Corrections :**
+* HS100 : désactivation des requêtes de consommation (réduction des erreurs)
+* Ignore les prises offline lors de la synchro Kasa
+
 Version 1.0 "Galette des rois" - 08/01/2019
 ===
 **Evolutions :**
