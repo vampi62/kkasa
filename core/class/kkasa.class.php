@@ -290,6 +290,8 @@ class kkasa extends eqLogic {
 	  			$deviceId    = $sysinfo['deviceId'];
 	  			$alias       = $sysinfo['alias'];
 	  			$type  			 = $sysinfo['type'];
+					if ($type != "IOT.SMARTPLUGSWITCH")
+						continue;
 					$fwVer			 = $sysinfo['sw_ver'];
 					$deviceName	 = $sysinfo['dev_name'];
 					$deviceModel = $sysinfo['model'];
