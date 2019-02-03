@@ -18,7 +18,7 @@
 
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
-define('KKPA_MIN_VERSION','1.2');
+define('KKPA_MIN_VERSION','2.0');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -290,8 +290,6 @@ class kkasa extends eqLogic {
 	  			$deviceId    = $sysinfo['deviceId'];
 	  			$alias       = $sysinfo['alias'];
 	  			$type  			 = $sysinfo['type'];
-					if ($type != "IOT.SMARTPLUGSWITCH")
-						continue;
 					$fwVer			 = $sysinfo['sw_ver'];
 					$deviceName	 = $sysinfo['dev_name'];
 					$deviceModel = $sysinfo['model'];
@@ -358,7 +356,8 @@ class kkasa extends eqLogic {
 				try
 				{
 		      $sysinfo = $device->getSysInfo();
-					$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
+					//$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
+					$changed = $this->setInfo('state',$device->getState()) || $changed;
 					$changed = $this->setInfo('rssi',$sysinfo['rssi']) || $changed;
 					$this->setConfiguration('sw_ver', $sysinfo['sw_ver']);
 					$this->setConfiguration('fwId', $sysinfo['fwId']);
@@ -462,6 +461,23 @@ class kkasa extends eqLogic {
 			{
 				case 'IOT.SMARTPLUGSWITCH':
 					return 'hs110.jpg';
+					break;
+
+				case 'IOT.SMARTBULB':
+					switch ($this->getDevice()->getModel())
+					{
+						case 'LB110':
+							return 'lb110.jpg';
+							break;
+
+						case 'LB120':
+							return 'lb120.jpg';
+							break;
+
+						case 'LB110':
+							return 'lb130.jpg';
+							break;
+					}
 					break;
 			}
 			return false;
