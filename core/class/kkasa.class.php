@@ -20,6 +20,7 @@
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKPA_MIN_VERSION','1.2');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
+require_once __DIR__  . '/../php/kkasa.inc.php';
 
 /*error_reporting(-1);
 ini_set('display_errors', 'On');*/
@@ -189,19 +190,50 @@ class kkasa extends eqLogic {
 
 		public static function health() {
 			$return = array();
+
+			$update = update::byLogicalId('kkasa');
+			if (is_object($update))
+			{
+				$state = ($update.getStatus()=='ok') ? 'OK' : 'KO';
+			} else {
+				$state = 'KO';
+			}
+
+			$return[] = array(
+				'test' => __('Version KKASA', __FILE__),
+				'result' => KKASA_VERSION,
+				'advice' => ($state == 'OK') ? '' : __('Mettre à jour le plugin',__FILE__),
+				'state' => $state,
+			);
+
+			try {
+				if (class_exists('KKPA\Clients\KKPAApiClient'))
+					$kkpa_version = KKPA\Clients\KKPAApiClient::getVersion();
+				else {
+					$kkpa_version = 'KO';
+				}
+			} catch(Exception $ex)
+			{
+				$kkpa_version = 'KO';
+			}
 			$result = strtoupper(self::dependancy_info()['state']);
 			$return[] = array(
-				'test' => __('Dépendances', __FILE__),
-				'result' => $result,
+				'test' => __('Version KKPA', __FILE__),
+				'result' => $kkpa_version,
 				'advice' => ($result == 'OK') ? '' : __('(ré)Installer les dépendance dans la configuration du plugin',__FILE__),
 				'state' => ($result == 'OK'),
 			);
 
 			try
       {
-        $client = self::getClient();
-				$client->getAccessToken();
-				$state = true;
+				if (class_exists('KKPA\Clients\KKPAApiClient'))
+				{
+	        $client = self::getClient();
+					$client->getAccessToken();
+					$state = true;
+				} else {
+					$state = false;
+				}
       }
       catch(KKPA\Exceptions\KKPAClientException $ex)
       {
@@ -524,10 +556,13 @@ class kkasa extends eqLogic {
 		public function setInfo($cmd_name,$value)
 		{
 			$cmd = $this->getCmd(null,$cmd_name);
-			$changed = $this->checkAndUpdateCmd($cmd_name, $value);
-			log::add('kkasa','debug','set: '.$cmd->getName().' to '. $value);
-			$cmd->event($value,null,0);
-			return $changed;
+			if (is_object($cmd)) {
+				$changed = $this->checkAndUpdateCmd($cmd_name, $value);
+				log::add('kkasa','debug','set: '.$cmd->getName().' to '. $value);
+				$cmd->event($value,null,0);
+				return $changed;
+			}
+			return false;
 		}
 }
 
