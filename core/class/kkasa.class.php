@@ -194,7 +194,7 @@ class kkasa extends eqLogic {
 			$update = update::byLogicalId('kkasa');
 			if (is_object($update))
 			{
-				$state = ($update.getStatus()=='ok') ? 'OK' : 'KO';
+				$state = ($update->getStatus()=='ok') ? 'OK' : 'KO';
 			} else {
 				$state = 'KO';
 			}
