@@ -11,7 +11,7 @@
         "Configuration avancée": "Advanced configuration",
         "Equipement": "Equipment",
         "Commandes": "Commands",
-        "Nom de l'équipement": "Name of the equipment",
+        "Nom de l'équipement": "Device name",
         "Objet parent": "Parent object",
         "Aucun": "None",
         "Catégorie": "Category",
@@ -30,19 +30,24 @@
         "Nom": "Name",
         "Options": "Options",
         "Action": "Action",
-        "Debug Infos": "Debug Infos"
+        "Debug Infos": "Debug Info"
     },
     "plugins\/kkasa\/desktop\/js\/kkasa.js": {
         "Nom": "Name",
         "Visible": "Visible",
-        "Historiser": "Logging",
+        "Historiser": "Historize",
         "Tester": "Test",
         "Synchronisation réussie": "Successful synchronization",
         "Merci de raffraichir la page": "Please refresh the page"
     },
     "plugins\/kkasa\/plugin_info\/configuration.php": {
         "Nom d'utilisateur Kasa": "Kasa Username",
-        "Mot de passe Kasa": "Kasa password"
+        "Mot de passe Kasa": "Kasa password",
+        "Fréquence de raffraîchissement auto": "Fréquence de raffraîchissement auto",
+        "Aucun": "Aucun",
+        "min": "min",
+        "Heure": "Heure",
+        "jour": "jour"
     },
     "plugins\/kkasa\/core\/class\/kkasa.class.php": {
         "Power": "Power",
@@ -53,9 +58,22 @@
         "Rafraîchir": "Refresh",
         "On": "On",
         "Off": "Off",
-        "Etat": "Etat",
-        "Puissance": "Puissance",
-        "Intensité": "Intensité",
-        "Consommation": "Consommation"
+        "Etat": "State",
+        "Puissance": "Power",
+        "Intensité": "Intensity",
+        "Consommation": "Consumption",
+        "Dépendances": "Dependencies",
+        "Identification Kasa": "Kasa credentials",
+        "Prises hors ligne": "Offline plugs",
+        "Equipement %s trouvé mais injoignable. Ignoré": "Equipement %s trouvé mais injoignable. Ignoré",
+        "Force signal": "Force signal",
+        "Version KKASA": "Version KKASA",
+        "Mettre à jour le plugin": "Mettre à jour le plugin",
+        "Version KKPA": "Version KKPA",
+        "Vérifier vos identifiants Kasa dans la configuration du plugin": "Vérifier vos identifiants Kasa dans la configuration du plugin",
+        "Vérifiez que vos prises sont connectées au wifi": "Vérifiez que vos prises sont connectées au wifi"
+    },
+    "plugins\/kkasa\/core\/ajax\/kkasa.ajax.php": {
+        "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa": "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa"
     }
 }

@@ -4,7 +4,7 @@ Description
 Plugin for controlling TP-Link connected objects via the manufacturer's platform: [Kasa](https://www.tp-link.com/us/kasa-smart/kasa.html).
 Today, only the connected plugs HS100 and HS110 (v1 & v2) are processed.
 
-warnings
+Warnings
 ===
 
 I do not have the vocation to ensure a long-term maintenance of this plugin.
@@ -19,7 +19,7 @@ market to benefit others. However:
 
 -   As mentioned before, this plugin only supports the HS100 and HS110 (v1 & v2) plugs.
     The reason is simple: it's all I have at home. I would be delighted to
-    to deal with other devices ... but you will have to offer them to me (thanks by advance!) ;)
+    to deal with other devices... but you will have to offer them to me (thanks by advance!) ;)
     However, if you try to use the plugin with other hardware,
     do not hesitate to inform me on the forum if it works properly or
     not.
@@ -39,30 +39,37 @@ Setup
 Following the installation and activation of the plugin, go to the page of
 configuration to install the dependencies.
 
-P.S .: For some unknown reason, sometimes the dependencies are
-marked "OK" when they are not. In doubt always press
-"Reinstall".
+Then enter your Kasa credentials and select the desired refresh rate.
 
-Then enter your Kasa credentials.
+**Warning:** I have no information about a possible limit on the number of Kasa API requests, but if it exists TP-Link may be blocking your requests deemed too frequent and considered abusive.
+For the moment, I have limited myself to a refresh rate of 15min during my tests without worries.
 
-Save, then go to the plugin page (in the "connected devices" category).
+You therefore remain responsible for your use, the choice of this parameter and the possible consequences that this would imply.
 
-Press "Synchronize with Kasa". Once the synchronization is successful, you have to refresh the page to see your equipment.
+Save, then go to the plugin page (in the "connected objects" category).
 
-There you go!
+Press "Synchronize with Kasa" and you should see your equipment.
+
+Et voila!
 
 Debug
 ===
-If you have problems, you can tell me on github issues or jeedom forum dedicated topic.
-Thank you in advance to activate the "debug" log level for the plugin. A new "Debug Infos" button will appear on the plugin page. Press it. Reproduce your mistake. Then send the result of the  kkasa log.
+If you encounter any issue, you can report it back on github issues or jeedom forum.
+Thank you in advance for:
+* enable "debug" log level on the plugin.
+* Reproduce the issue.
+* A new "Debug Info" button appeared on the plugin page. Press it.
+* Then send the result of the log kkasa.
 
 Another warning!
 ===
-* The information "current" sometimes seems inconsistent. However, the plugin only display the data as they are sent by the Kasa server. It is therefore rather adviser to trust the "power" data.
+* Owners of HS110 may have noticed that the power is not always equal to the product of the voltage and the intensity. The reason lies in the difference between active and apparent power.
 
-* The updating of the values ​​(state, power, consumption) is done on request
-with the "refresh" command, when saving your equipment, on the call
-of an action (switch On / Off) and via the cron every 15min.
-This means that a change of state directly from physical device 
-or via the Kasa application will only be taken into account after 15min (or per manual action 
- from you on Jeedom).
+More information on the [page wikipedia] (https://en.wikipedia.org/wiki/AC_power). __
+
+* The values update (state, power, consumption) is done on request
+with the "refresh" command, when saving your equipment, on the action call
+ (switch On / Off) and via the cron according to the refresh frequency you have set.
+This means that a change of state directly from the equipment
+or from the Kasa app will only be taken into account after your refresh period (or by action call 
+from you on Jeedom).

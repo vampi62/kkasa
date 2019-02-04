@@ -71,7 +71,16 @@ $('#btSync').on('click', function () {
                 $('#div_alert').showAlert({message: data.result, level: 'danger'});
                 return;
             }
-            $('#div_alert').showAlert({message: '{{Synchronisation réussie}}.{{Merci de raffraichir la page}}', level: 'success'});
+            $('#div_alert').showAlert({message: "{{Synchronisation réussie}}. "+data.result.toString()+" {{équipement(s) trouvé(s)}}. {{Merci de raffraichir la page}}", level: 'success'});
+            var vars = getUrlVars();
+            var url = 'index.php?';
+            for (var i in vars) {
+              if (i != 'id' && i != 'saveSuccessFull' && i != 'removeSuccessFull') {
+                url += i + '=' + vars[i].replace('#', '') + '&';
+              }
+            }
+            url += 'syncedDevices=' + data.result.toString();
+            loadPage(url);
         }
     });
 });
@@ -96,3 +105,12 @@ $('#btDebug').on('click', function () {
         }
     });
 });
+
+if (getUrlVars('syncedDevices') > 0) {
+    $('#div_alert').showAlert(
+      {message:
+        '{{Synchronisation réussie}}. '
+        + getUrlVars('syncedDevices')+" {{équipement(s) trouvé(s)}}. "
+        , level: 'success'}
+    );
+}

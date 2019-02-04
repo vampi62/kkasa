@@ -27,8 +27,14 @@ try {
     ajax::init();
 
   	if (init('action') == 'syncWithKasa') {
-      kkasa::syncWithKasa();
-      ajax::success();
+      $nb_devices = kkasa::syncWithKasa();
+      if ($nb_devices>0)
+      {
+        ajax::success($nb_devices);
+      }
+      else {
+        ajax::error(__("Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa",__FILE__));
+      }
   	} elseif(init('action') == 'debugInfo') {
       kkasa::getDebugInfo();
       ajax::success();

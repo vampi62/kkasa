@@ -42,7 +42,12 @@
     },
     "plugins\/kkasa\/plugin_info\/configuration.php": {
         "Nom d'utilisateur Kasa": "Nom d'utilisateur Kasa",
-        "Mot de passe Kasa": "Mot de passe Kasa"
+        "Mot de passe Kasa": "Mot de passe Kasa",
+        "Fréquence de raffraîchissement auto": "Fréquence de raffraîchissement auto",
+        "Aucun": "Aucun",
+        "min": "min",
+        "Heure": "Heure",
+        "jour": "jour"
     },
     "plugins\/kkasa\/core\/class\/kkasa.class.php": {
         "Power": "Power",
@@ -59,6 +64,16 @@
         "Consommation": "Consommation",
         "Dépendances": "Dépendances",
         "Identification Kasa": "Identification Kasa",
-        "Prises hors ligne": "Prises hors ligne"
+        "Prises hors ligne": "Prises hors ligne",
+        "Equipement %s trouvé mais injoignable. Ignoré": "Equipement %s trouvé mais injoignable. Ignoré",
+        "Force signal": "Force signal",
+        "Version KKASA": "Version KKASA",
+        "Mettre à jour le plugin": "Mettre à jour le plugin",
+        "Version KKPA": "Version KKPA",
+        "Vérifier vos identifiants Kasa dans la configuration du plugin": "Vérifier vos identifiants Kasa dans la configuration du plugin",
+        "Vérifiez que vos prises sont connectées au wifi": "Vérifiez que vos prises sont connectées au wifi"
+    },
+    "plugins\/kkasa\/core\/ajax\/kkasa.ajax.php": {
+        "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa": "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa"
     }
 }

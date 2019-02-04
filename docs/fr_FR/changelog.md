@@ -1,3 +1,17 @@
+Version 1.1 "Chandeleur" - 04/02/2019
+===
+**Evolutions :**
+* Plusieurs tentatives avant échec de la requête
+* Gestion des fréquences de rafraîchissement auto
+* Rafraîchissement de page automatique après synchro Kasa
+* Ajout force du signal
+* Compatibilité avec KKPA v2
+
+**Corrections :**
+* HS100 : désactivation des requêtes de consommation (réduction des erreurs)
+* Ignore les prises offline lors de la synchro Kasa
+* Corrections de la page santé
+
 Version 1.0 "Galette des rois" - 08/01/2019
 ===
 **Evolutions :**

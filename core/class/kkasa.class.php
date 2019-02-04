@@ -18,8 +18,9 @@
 
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
-define('KKPA_MIN_VERSION','1.1');
+define('KKPA_MIN_VERSION','1.2');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
+require_once __DIR__  . '/../php/kkasa.inc.php';
 
 /*error_reporting(-1);
 ini_set('display_errors', 'On');*/
@@ -91,28 +92,55 @@ class kkasa extends eqLogic {
       }
 			return $this->_device;
 		}
-    /*
-     * Fonction exécutée automatiquement toutes les minutes par Jeedom
-      public static function cron() {
 
-      }
-     */
+		public function isPowerAvailable() {
+			return (substr($this->getConfiguration('model'),0,5) == 'HS110');
+		}
 
+    public static function cron() {
+ 		 if (strval(config::byKey('cron_freq','kkasa','15'))=='1')
+ 		 		self::cronExec();
+    }
 
-    /*
-     * Fonction exécutée automatiquement toutes les heures par Jeedom
-      public static function cronHourly() {
+		public static function cron5() {
+ 		 if (strval(config::byKey('cron_freq','kkasa','15'))=='5')
+ 		 		self::cronExec();
+    }
 
-      }
-     */
-
-    /*
-     * Fonction exécutée automatiquement tous les jours par Jeedom
-      public static function cronDaily() {
-
-      }
-     */
 	 public static function cron15() {
+		 if (strval(config::byKey('cron_freq','kkasa','15'))=='15')
+		 		self::cronExec();
+	 }
+
+	public static function cron30() {
+		if (strval(config::byKey('cron_freq','kkasa','15'))=='30')
+			 self::cronExec();
+	}
+
+    public static function cronHourly() {
+ 		 if (strval(config::byKey('cron_freq','kkasa','15'))=='60')
+ 		 		self::cronExec();
+    }
+
+		public static function cronDaily() {
+ 		 if (config::byKey('cron_freq','kkasa','15')=='3600')
+ 		 		self::cronExec();
+
+		 // Once a day: update the firmware version
+ 		 foreach (self::byType('kkasa') as $kkasa) {
+ 			 if ($kkasa->getIsEnable())
+ 			 {
+				 	$device = $this->getDevice();
+ 					$sysinfo = $device->getSysInfo();
+ 					$kkasa->setConfiguration('sw_ver', $sysinfo['sw_ver']);
+ 					$kkasa->setConfiguration('fwId', $sysinfo['fwId']);
+ 					$kkasa->setConfiguration('oemId', $sysinfo['oemId']);
+ 					$kkasa->save();
+ 			 }
+ 		 }
+		}
+
+	 public static function cronExec() {
 		 foreach (self::byType('kkasa') as $kkasa) {
 			 if ($kkasa->getIsEnable())
 			 {
@@ -120,7 +148,6 @@ class kkasa extends eqLogic {
 			 }
 		 }
 	 }
-
 
    public static function dependancy_info() {
 		  log::add(__CLASS__ . '_update','debug','Checking dependancy');
@@ -163,19 +190,50 @@ class kkasa extends eqLogic {
 
 		public static function health() {
 			$return = array();
+
+			$update = update::byLogicalId('kkasa');
+			if (is_object($update))
+			{
+				$state = ($update->getStatus()=='ok') ? 'OK' : 'KO';
+			} else {
+				$state = 'KO';
+			}
+
+			$return[] = array(
+				'test' => __('Version KKASA', __FILE__),
+				'result' => KKASA_VERSION,
+				'advice' => ($state == 'OK') ? '' : __('Mettre à jour le plugin',__FILE__),
+				'state' => $state,
+			);
+
+			try {
+				if (class_exists('KKPA\Clients\KKPAApiClient'))
+					$kkpa_version = KKPA\Clients\KKPAApiClient::getVersion();
+				else {
+					$kkpa_version = 'KO';
+				}
+			} catch(Exception $ex)
+			{
+				$kkpa_version = 'KO';
+			}
 			$result = strtoupper(self::dependancy_info()['state']);
 			$return[] = array(
-				'test' => __('Dépendances', __FILE__),
-				'result' => $result,
+				'test' => __('Version KKPA', __FILE__),
+				'result' => $kkpa_version,
 				'advice' => ($result == 'OK') ? '' : __('(ré)Installer les dépendance dans la configuration du plugin',__FILE__),
 				'state' => ($result == 'OK'),
 			);
 
 			try
       {
-        $client = self::getClient();
-				$client->getAccessToken();
-				$state = true;
+				if (class_exists('KKPA\Clients\KKPAApiClient'))
+				{
+	        $client = self::getClient();
+					$client->getAccessToken();
+					$state = true;
+				} else {
+					$state = false;
+				}
       }
       catch(KKPA\Exceptions\KKPAClientException $ex)
       {
@@ -218,6 +276,7 @@ class kkasa extends eqLogic {
     public static function syncWithKasa() {
   		$client = self::getClient();
   		$devicelist = $client->getDeviceList();
+			$nb_devices = 0;
   		foreach ($devicelist as $device) {
 				if (method_exists($device,'toString')) // Retrocompatibility. To be removed after
 				{
@@ -225,110 +284,145 @@ class kkasa extends eqLogic {
 				} else {
 					log::add(__CLASS__, 'debug', print_r($device, true));
 				}
-        $sysinfo     = $device->getSysInfo();
-  			$deviceId    = $sysinfo['deviceId'];
-  			$alias       = $sysinfo['alias'];
-  			$type  			 = $sysinfo['type'];
-				$fwVer			 = $sysinfo['sw_ver'];
-				$deviceName	 = $sysinfo['dev_name'];
-				$deviceModel = $sysinfo['model'];
-				$deviceMac	 = $sysinfo['mac'];
-				$hwId				 = $sysinfo['hwId'];
-				$fwId				 = $sysinfo['fwId'];
-				$oemId			 = $sysinfo['oemId'];
-				$deviceHwVer = $sysinfo['hw_ver'];
+				try
+				{
+	        $sysinfo     = $device->getSysInfo();
+	  			$deviceId    = $sysinfo['deviceId'];
+	  			$alias       = $sysinfo['alias'];
+	  			$type  			 = $sysinfo['type'];
+					if ($type != "IOT.SMARTPLUGSWITCH")
+						continue;
+					$fwVer			 = $sysinfo['sw_ver'];
+					$deviceName	 = $sysinfo['dev_name'];
+					$deviceModel = $sysinfo['model'];
+					$deviceMac	 = $sysinfo['mac'];
+					$hwId				 = $sysinfo['hwId'];
+					$fwId				 = $sysinfo['fwId'];
+					$oemId			 = $sysinfo['oemId'];
+					$deviceHwVer = $sysinfo['hw_ver'];
 
-  			$eqLogic = kkasa::byLogicalId($deviceId, 'kkasa');
-  			if (!is_object($eqLogic)) {
-  				$eqLogic = new self();
-                  foreach (object::all() as $object) {
-                      if (stristr($alias,$object->getName())){
-                          $eqLogic->setObject_id($object->getId());
-                          break;
-                      }
-                  }
-  				$eqLogic->setLogicalId($deviceId);
-  				$eqLogic->setName($alias);
-					$eqLogic->setConfiguration('type', $type);
-					$eqLogic->setConfiguration('sw_ver', $fwVer);
-					$eqLogic->setConfiguration('dev_name', $deviceName);
-					$eqLogic->setConfiguration('model', $deviceModel);
-					$eqLogic->setConfiguration('mac', $deviceMac);
-					$eqLogic->setConfiguration('hwId', $hwId);
-					$eqLogic->setConfiguration('fwId', $fwId);
-					$eqLogic->setConfiguration('oemId', $oemId);
-					$eqLogic->setConfiguration('hw_ver', $deviceHwVer);
+	  			$eqLogic = kkasa::byLogicalId($deviceId, 'kkasa');
+	  			if (!is_object($eqLogic)) {
+	  				$eqLogic = new self();
+	                  foreach (object::all() as $object) {
+	                      if (stristr($alias,$object->getName())){
+	                          $eqLogic->setObject_id($object->getId());
+	                          break;
+	                      }
+	                  }
+	  				$eqLogic->setLogicalId($deviceId);
+	  				$eqLogic->setName($alias);
+						$eqLogic->setConfiguration('type', $type);
+						$eqLogic->setConfiguration('sw_ver', $fwVer);
+						$eqLogic->setConfiguration('dev_name', $deviceName);
+						$eqLogic->setConfiguration('model', $deviceModel);
+						$eqLogic->setConfiguration('mac', $deviceMac);
+						$eqLogic->setConfiguration('hwId', $hwId);
+						$eqLogic->setConfiguration('fwId', $fwId);
+						$eqLogic->setConfiguration('oemId', $oemId);
+						$eqLogic->setConfiguration('hw_ver', $deviceHwVer);
+						$eqLogic->setConfiguration('cron_freq', 15);
 
-  				$eqLogic->setEqType_name('kkasa');
-  				$eqLogic->setIsVisible(1);
-  				$eqLogic->setIsEnable(1);
-  				$eqLogic->save();
-  			}
-				$eqLogic->refreshWidget();
-  		}
+	  				$eqLogic->setEqType_name('kkasa');
+	  				$eqLogic->setIsVisible(1);
+	  				$eqLogic->setIsEnable(1);
+	  				$eqLogic->save();
+	  			}
+					$nb_devices++;
+					$eqLogic->refreshWidget();
+				} catch(KKPA\Exceptions\KKPADeviceException $ex)
+				{
+					if ($ex->getCode() == KKPA_DEVICE_OFFLINE || $ex->getCode() == KKPA_TIMEOUT)
+					{
+						log::add(__CLASS__, 'warning',
+							sprintf(
+								__('Equipement %s trouvé mais injoignable. Ignoré',__FILE__),
+								$device->getVariable('deviceId','')
+							)
+						);
+					}
+				}
+	  	}
+			return $nb_devices;
   	}
 
 		public function syncRealTime()
 		{
+			$attempt = 0;
+			$success = false;
 			$changed = false;
 			$device = $this->getDevice();
 			log::add('kkasa','debug','Processing refresh of '.$device->getVariable('deviceId',''));
-			try
+			while((!$success) && $attempt < 3)
 			{
-				$data = $device->getRealTime();
-	      $sysinfo = $device->getSysInfo();
-				foreach($data as $key => $value)
+				try
 				{
-					switch($key)
-					{
-						case 'power_mw':
-							$cmd_name = 'power';
-							$value = $value/1000;
-							break;
-						case 'power':
-							$cmd_name = 'power';
-							$value = $value;
-							break;
-						case 'voltage_mv':
-							$cmd_name = 'voltage';
-							$value = $value/1000;
-							break;
-						case 'voltage':
-							$cmd_name = 'voltage';
-							$value = $value;
-							break;
-						case 'current_ma':
-							$cmd_name = 'current';
-							$value = $value/1000;
-							break;
-						case 'current':
-							$cmd_name = 'current';
-							$value = $value;
-							break;
-						case 'total_wh':
-							$cmd_name = 'consumption';
-							break;
-						case 'total':
-							$cmd_name = 'consumption';
-							break;
-						default:
-							$cmd_name = '';
-							continue;
+		      $sysinfo = $device->getSysInfo();
+					$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
+					$changed = $this->setInfo('rssi',$sysinfo['rssi']) || $changed;
+					$this->setConfiguration('sw_ver', $sysinfo['sw_ver']);
+					$this->setConfiguration('fwId', $sysinfo['fwId']);
+					$this->setConfiguration('oemId', $sysinfo['oemId']);
 
+					if ($this->isPowerAvailable())
+					{
+						$data = $device->getRealTime();
+						foreach($data as $key => $value)
+						{
+							switch($key)
+							{
+								case 'power_mw':
+									$cmd_name = 'power';
+									$value = $value/1000;
+									break;
+								case 'power':
+									$cmd_name = 'power';
+									$value = $value;
+									break;
+								case 'voltage_mv':
+									$cmd_name = 'voltage';
+									$value = $value/1000;
+									break;
+								case 'voltage':
+									$cmd_name = 'voltage';
+									$value = $value;
+									break;
+								case 'current_ma':
+									$cmd_name = 'current';
+									$value = $value/1000;
+									break;
+								case 'current':
+									$cmd_name = 'current';
+									$value = $value;
+									break;
+								case 'total_wh':
+									$cmd_name = 'consumption';
+									break;
+								case 'total':
+									$cmd_name = 'consumption';
+									break;
+								default:
+									$cmd_name = '';
+									continue;
+
+							}
+							if ($cmd_name != '')
+								$changed = $this->setInfo($cmd_name,$value) || $changed;
+						}
 					}
-					if ($cmd_name != '')
-						$changed = $this->setInfo($cmd_name,$value) || $changed;
+					$success = true;
+
+					if ($changed) {
+						$this->refreshWidget();
+					}
 				}
-				$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
-				if ($changed) {
-					$this->refreshWidget();
+				catch(Exception $ex)
+				{
+					$attempt++;
+		  		log::add(__CLASS__, 'debug', "ERROR during request - attempt #" . $attempt . "/3");
+		  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+					if ($attempt>2) throw $ex;
 				}
-			}
-			catch(Exception $ex)
-			{
-	  		log::add(__CLASS__, 'debug', "ERROR during request");
-	  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-				throw $ex;
 			}
 
 		}
@@ -336,23 +430,30 @@ class kkasa extends eqLogic {
 		public function setState($state)
 		{
 			$device = $this->getDevice();
-			try
+			$success = false;
+			$attempt = 0;
+			while ((!$success) && $attempt < 3)
 			{
-				$state = boolval($state);
-				if ($state)
+				try
 				{
-					$device->switchOn();
-				} else {
-					$device->switchOff();
+					$state = boolval($state);
+					if ($state)
+					{
+						$device->switchOn();
+					} else {
+						$device->switchOff();
+					}
+					sleep(1.5);
+					$this->syncRealTime();
+					$success = true;
 				}
-				sleep(1.5);
-				$this->syncRealTime();
-			}
-			catch(Exception $ex)
-			{
-				log::add(__CLASS__, 'debug', "ERROR during request");
-				log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-				throw $ex;
+				catch(Exception $ex)
+				{
+					$attempt++;
+					log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
+					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+					if ($attempt > 2) throw $ex;
+				}
 			}
 		}
 
@@ -408,13 +509,14 @@ class kkasa extends eqLogic {
 			$this->addCmd('refresh','action','other',__('Rafraîchir',__FILE__),1);
 			$this->addCmd('on','action','other',__('On',__FILE__),1,null,null,'ENERGY_ON');
 			$this->addCmd('off','action','other',__('Off',__FILE__),1,null,null,'ENERGY_OFF');
-			if (substr($this->getConfiguration('model'),0,5) == 'HS110') {
+			$this->addCmd('rssi','info','numeric',__('Force signal',__FILE__),0,1,'dBm');
+			if ($this->isPowerAvailable()) {
 				$this->addCmd('power','info','numeric',__('Puissance',__FILE__),1,1,'W','POWER');
 				$this->addCmd('voltage','info','numeric',__('Voltage',__FILE__),0,0,'V','VOLTAGE');
 				$this->addCmd('current','info','numeric',__('Intensité',__FILE__),0,0,'A',null);
 				$this->addCmd('consumption','info','numeric',__('Consommation',__FILE__),1,1,'WH','CONSUMPTION');
-				$this->syncRealTime();
 			}
+			$this->syncRealTime();
     }
 
     public function preUpdate() {
@@ -456,10 +558,13 @@ class kkasa extends eqLogic {
 		public function setInfo($cmd_name,$value)
 		{
 			$cmd = $this->getCmd(null,$cmd_name);
-			$changed = $this->checkAndUpdateCmd($cmd_name, $value);
-			log::add('kkasa','debug','set: '.$cmd->getName().' to '. $value);
-			$cmd->event($value,null,0);
-			return $changed;
+			if (is_object($cmd)) {
+				$changed = $this->checkAndUpdateCmd($cmd_name, $value);
+				log::add('kkasa','debug','set: '.$cmd->getName().' to '. $value);
+				$cmd->event($value,null,0);
+				return $changed;
+			}
+			return false;
 		}
 }
 
