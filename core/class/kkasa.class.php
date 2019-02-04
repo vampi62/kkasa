@@ -84,11 +84,23 @@ class kkasa extends eqLogic {
 
 		public function getDevice() {
 			if ($this->_device == null) {
-        $this->_device =  new KKPA\Clients\KKPAPlugApiClient(array(
+				$conf = array(
           'username' => config::byKey('username', 'kkasa'),
           'password' => config::byKey('password', 'kkasa'),
 					'deviceId' => $this->getLogicalId()
-        ));
+				);
+				switch ($this->getConfiguration("type"))
+				{
+					case 'IOT.SMARTBULB':
+						$this->_device =  new KKPA\Clients\KKPABulbApiClient($conf);
+						break;
+					case 'IOT.SMARTPLUGSWITCH':
+						if (substr($this->getConfiguration("model"),0,5)=='HS300')
+							$this->_device =  new KKPA\Clients\KKPAMultiPlugApiClient($conf);
+						else
+							$this->_device =  new KKPA\Clients\KKPAPlugApiClient($conf);
+						break;
+				}
       }
 			return $this->_device;
 		}
@@ -471,10 +483,10 @@ class kkasa extends eqLogic {
 							break;
 
 						case 'LB120':
-							return 'lb120.jpg';
+							return 'lb120.png';
 							break;
 
-						case 'LB110':
+						case 'LB130':
 							return 'lb130.jpg';
 							break;
 					}
