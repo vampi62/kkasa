@@ -44,6 +44,7 @@ class kkasa extends eqLogic {
         self::$_client =  new KKPA\Clients\KKPAApiClient(array(
           'username' => config::byKey('username', 'kkasa'),
           'password' => config::byKey('password', 'kkasa'),
+          'cloud' => config::byKey('cloud', 'kkasa'),
         ));
       }
       try
@@ -69,8 +70,8 @@ class kkasa extends eqLogic {
 					log::add(__CLASS__, 'debug', '***  Device '.$device->getVariable('deviceId',''));
 					$device->getSysInfo();
 		  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-					$device->getRealTime();
-		  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+					if (!is_null($device->getRealTime()))
+		  			log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
 				} catch (KKPA\Exceptions\KKPASDKException $ex)
 				{
 					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
@@ -87,7 +88,10 @@ class kkasa extends eqLogic {
 				$conf = array(
           'username' => config::byKey('username', 'kkasa'),
           'password' => config::byKey('password', 'kkasa'),
-					'deviceId' => $this->getLogicalId()
+					'deviceId' => $this->getLogicalId(),
+          'cloud' => config::byKey('cloud', 'kkasa'),
+          'local_ip' => $this->getConfiguration('local_ip'),
+          'local_port' => $this->getConfiguration('local_port',9999)
 				);
 				switch ($this->getConfiguration("type"))
 				{
@@ -331,7 +335,17 @@ class kkasa extends eqLogic {
 						$eqLogic->setConfiguration('fwId', $fwId);
 						$eqLogic->setConfiguration('oemId', $oemId);
 						$eqLogic->setConfiguration('hw_ver', $deviceHwVer);
-						$eqLogic->setConfiguration('cron_freq', 15);
+						if ($device->getVariable('local_ip','')!='')
+						{
+							$eqLogic->setConfiguration(
+								'local_ip',
+								$device->getVariable('local_ip','')
+							);
+							$eqLogic->setConfiguration(
+								'local_port',
+								$device->getVariable('local_port',9999)
+							);
+						}
 
 	  				$eqLogic->setEqType_name('kkasa');
 	  				$eqLogic->setIsVisible(1);
@@ -478,8 +492,8 @@ class kkasa extends eqLogic {
 				case 'IOT.SMARTBULB':
 					switch ($this->getDevice()->getModel())
 					{
-						case 'LB110':
-							return 'lb110.jpg';
+						case 'LB100':
+							return 'lb100.jpg';
 							break;
 
 						case 'LB120':

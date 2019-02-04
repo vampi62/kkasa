@@ -21,6 +21,7 @@ require_once dirname(__FILE__) . '/../core/php/kkasa.inc.php';
 
 function kkasa_install() {
   config::save('cron_freq', '15','kkasa');
+  config::save('cloud', '1','kkasa');
   config::save('version',KKASA_VERSION,'kkasa');
 }
 
@@ -28,6 +29,10 @@ function kkasa_update() {
   if (config::byKey('cron_freq', 'kkasa','-1')=='-1')
   {
     config::save('cron_freq', '15','kkasa');
+  }
+  if (config::byKey('cloud', 'kkasa','-1')=='-1')
+  {
+    config::save('cloud', '1','kkasa');
   }
   $kkasa_version = config::byKey('version','kkasa','1.0');
   log::add('kkasa', 'debug', "Update kkasa from ".$kkasa_version . " to ".KKASA_VERSION);

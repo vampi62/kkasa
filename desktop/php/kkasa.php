@@ -96,17 +96,17 @@ foreach (object::all() as $object) {
                </div>
            </div>
 	   <div class="form-group">
-                <label class="col-sm-3 control-label">{{Catégorie}}</label>
-                <div class="col-sm-9">
-                 <?php
-                    foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
-                    echo '<label class="checkbox-inline">';
-                    echo '<input type="checkbox" class="eqLogicAttr" data-l1key="category" data-l2key="' . $key . '" />' . $value['name'];
-                    echo '</label>';
-                    }
-                  ?>
-               </div>
-           </div>
+          <label class="col-sm-3 control-label">{{Catégorie}}</label>
+          <div class="col-sm-9">
+           <?php
+              foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
+              echo '<label class="checkbox-inline">';
+              echo '<input type="checkbox" class="eqLogicAttr" data-l1key="category" data-l2key="' . $key . '" />' . $value['name'];
+              echo '</label>';
+              }
+            ?>
+         </div>
+     </div>
 	<div class="form-group">
 		<label class="col-sm-3 control-label"></label>
 		<div class="col-sm-9">
@@ -125,6 +125,18 @@ foreach (object::all() as $object) {
 			 <label class="col-sm-3 control-label">{{Type}}</label>
 			 <div class="col-sm-3">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="type"/>
+			 </div>
+		</div>
+		<div class="form-group">
+			 <label class="col-sm-3 control-label">{{Local IP}}</label>
+			 <div class="col-sm-3">
+					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="local_ip"/>
+			 </div>
+		</div>
+		<div class="form-group">
+			 <label class="col-sm-3 control-label">{{Local port}}</label>
+			 <div class="col-sm-3">
+					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="local_port"/>
 			 </div>
 		</div>
 		<div class="form-group">

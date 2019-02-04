@@ -25,6 +25,15 @@ if (!isConnect()) {
 <form class="form-horizontal">
     <fieldset>
         <div class="form-group">
+            <label class="col-sm-4 control-label">{{Mode}}</label>
+            <div class="col-lg-2">
+                <select class="form-control configKey" data-l1key="cloud">
+                  <option value="0">{{Local}}</option>
+                  <option value="1">{{Cloud}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
             <label class="col-lg-4 control-label">{{Nom d'utilisateur Kasa}}</label>
             <div class="col-lg-2">
                 <input class="configKey form-control" data-l1key="username" />
