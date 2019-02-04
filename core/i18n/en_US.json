@@ -66,7 +66,12 @@
         "Identification Kasa": "Kasa credentials",
         "Prises hors ligne": "Offline plugs",
         "Equipement %s trouvé mais injoignable. Ignoré": "Equipement %s trouvé mais injoignable. Ignoré",
-        "Force signal": "Force signal"
+        "Force signal": "Force signal",
+        "Version KKASA": "Version KKASA",
+        "Mettre à jour le plugin": "Mettre à jour le plugin",
+        "Version KKPA": "Version KKPA",
+        "Vérifier vos identifiants Kasa dans la configuration du plugin": "Vérifier vos identifiants Kasa dans la configuration du plugin",
+        "Vérifiez que vos prises sont connectées au wifi": "Vérifiez que vos prises sont connectées au wifi"
     },
     "plugins\/kkasa\/core\/ajax\/kkasa.ajax.php": {
         "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa": "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa"
