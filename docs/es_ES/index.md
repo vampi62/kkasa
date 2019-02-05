@@ -8,26 +8,9 @@ A ce jour, seule les prises connectées HS100 et HS110 (v1&v2) sont traités.
 Avertissements
 ===
 
-Je n'ai pas la vocation d'assurer une maintenance long terme de ce plugin.
-Je l'ai avant tout créé pour moi-même. Une fois stable, je l'ai partagé sur le
-market afin d'en faire profiter d'autres. Cependant :
-
--   J'ai rarement le temps de me mettre sur des développements persos. Donc si
-    vous rencontrez un problème, n'hésitez pas à participer au sujet dédié
-    sur le forum ou sur les "issues" Github. Merci de regarder la section [Debug](#Debug) ci-dessous pour m'envoyer les bonnes informations.
-    Avec un peu de chance j'aurai le temps et la motivation pour
-    vous aider... mais je ne m'engage en rien.
-
--   Comme indiqué précédemment, ce plugin ne prend en charge que les prises HS100 et HS110 (v1 & v2).
-    La raison est simple : c'est tout ce que j'ai chez moi. Je serai ravi de
-    traiter d'autres périphériques... mais il faudra pour cela me les offrir ;)
-    Cependant, si vous tentez l'utilisation du plugin avec un autre matériel,
-    n'hésitez pas à m'informer sur le forum si ça fonctionne correctement ou
-    pas.
-
--   Ce développement est en Open Source (AGPL) et disponible sur github. Je
-    serais ravi de donner la main à d'autres contributeurs. N'hésitez pas à me
-    faire signe si vous êtes intéressés.
+-   A ce jour, seules les prises HS100 et HS110 (v1 & v2) sont prises en charge.
+-   Si vous rencontrez un problème, n'hésitez pas à participer au sujet dédié sur le forum ou sur les "issues" Github.
+    Merci de regarder la section [Debug](#Debug) ci-dessous pour m'envoyer les bonnes informations.
 
 Prérequis
 ===
@@ -37,8 +20,7 @@ Pour le moment, le plugin nécessite que vous ayez correctement installé votre
 
 Installation
 ===
-Suite à l'installation et activation du plugin, rendez-vous sur la page de
-configuration pour installer les dépendances.
+Suite à l'installation et activation du plugin, rendez-vous sur la page de configuration pour installer les dépendances.
 
 Puis renseigner vos identifiants Kasa et sélectionnez la fréquence de rafraîchissement désirée.
 
@@ -50,18 +32,19 @@ Vous restez donc responsable de votre utilisation, du choix de ce paramètre et 
 Sauvegardez, puis rendez-vous sur la page du plugin (dans la catégorie "objets
 connectés").
 
-Appuyez sur "Synchroniser avec Kasa" et vous devriez voir apparaitre vos équipements.
+Appuyez sur "Synchroniser avec Kasa" et vous devriez voir apparaître vos équipements.
 
 Et voila !
 
 Debug
-=== 
+===
 Si vous rencontrez des soucis, vous pouvez me le remonter sur les issues github ou forum jeedom.
 Merci au préalable de :
-* activer le niveau de log "debug" sur le plugin. 
+* activer le niveau de log "debug" sur le plugin.
 * Reproduisez votre erreur.
-* Un nouveau bouton "Debug Infos" est apparu sur la page du plugin. Appuyer dessus. 
+* Un nouveau bouton "Debug Infos" est apparu sur la page du plugin. Appuyer dessus.
 * Puis envoyer le résultat du log kkasa.
+**Obligatoire :** merci de m'indiquer les versions KKASA et KKPA utilisées (voir la page "santé" sur votre jeedom) ainsi que votre mode d'installation (depuis le market stable ou bêta ? depuis github branche master ou develop ?)
 
 Encore un avertissement !
 ===
