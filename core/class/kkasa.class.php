@@ -385,6 +385,8 @@ class kkasa extends eqLogic {
 					//$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
 					$changed = $this->setInfo('state',$device->getState()) || $changed;
 					$changed = $this->setInfo('rssi',$sysinfo['rssi']) || $changed;
+					if ($device->is_featured('LED'))
+						$changed = $this->setInfo('ledState',(!$sysinfo['led_off'])) || $changed;
 					$this->setConfiguration('sw_ver', $sysinfo['sw_ver']);
 					$this->setConfiguration('fwId', $sysinfo['fwId']);
 					$this->setConfiguration('oemId', $sysinfo['oemId']);
@@ -482,6 +484,31 @@ class kkasa extends eqLogic {
 			}
 		}
 
+		public function toogleLedState()
+		{
+			$device = $this->getDevice();
+			$ledState = !($device->getLedState());
+			$success = false;
+			$attempt = 0;
+			while ((!$success) && $attempt < 3)
+			{
+				try
+				{
+					$device->setLedState($ledState);
+					sleep(1.5);
+					$this->syncRealTime();
+					$success = true;
+				}
+				catch(Exception $ex)
+				{
+					$attempt++;
+					log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
+					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+					if ($attempt > 2) throw $ex;
+				}
+			}
+		}
+
 		public function getImgFilePath() {
 			switch($this->getConfiguration('type'))
 			{
@@ -546,17 +573,34 @@ class kkasa extends eqLogic {
 			$cmd->save();
 		}
 
-    public function postSave() {
+		public function addBasicCmd()
+		{
 			$this->addCmd('state','info','binary',__('Etat',__FILE__),1,1,null,'ENERGY_STATE');
 			$this->addCmd('refresh','action','other',__('Rafraîchir',__FILE__),1);
 			$this->addCmd('on','action','other',__('On',__FILE__),1,null,null,'ENERGY_ON');
 			$this->addCmd('off','action','other',__('Off',__FILE__),1,null,null,'ENERGY_OFF');
 			$this->addCmd('rssi','info','numeric',__('Force signal',__FILE__),0,1,'dBm');
+		}
+
+		public function addPowerCmd()
+		{
+			$this->addCmd('power','info','numeric',__('Puissance',__FILE__),1,1,'W','POWER');
+			$this->addCmd('voltage','info','numeric',__('Voltage',__FILE__),0,0,'V','VOLTAGE');
+			$this->addCmd('current','info','numeric',__('Intensité',__FILE__),0,0,'A',null);
+			$this->addCmd('consumption','info','numeric',__('Consommation',__FILE__),1,1,'WH','CONSUMPTION');
+		}
+
+		public function addLedCmd()
+		{
+			$this->addCmd('ledState','info','binary',__('LED activée',__FILE__),0,0,null,'LIGHT_STATE');
+			$this->addCmd('toogleLed','action','other',__('Commuter LED',__FILE__),0,0,null,'LIGHT_TOGGLE');
+		}
+
+    public function postSave() {
+			$this->addBasicCmd();
 			if ($this->isPowerAvailable()) {
-				$this->addCmd('power','info','numeric',__('Puissance',__FILE__),1,1,'W','POWER');
-				$this->addCmd('voltage','info','numeric',__('Voltage',__FILE__),0,0,'V','VOLTAGE');
-				$this->addCmd('current','info','numeric',__('Intensité',__FILE__),0,0,'A',null);
-				$this->addCmd('consumption','info','numeric',__('Consommation',__FILE__),1,1,'WH','CONSUMPTION');
+				$this->addPowerCmd();
+				$this->addLedCmd();
 			}
 			$this->syncRealTime();
     }
@@ -642,6 +686,9 @@ class kkasaCmd extends cmd {
 			}
 			if ($this->getLogicalId() == 'off') {
 				$eqLogic->setState(0);
+			}
+			if ($this->getLogicalId() == 'toogleLed') {
+				$eqLogic->toogleLedState();
 			}
 
 

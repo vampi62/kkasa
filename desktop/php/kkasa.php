@@ -73,18 +73,19 @@ foreach ($eqLogics as $eqLogic) {
   <div class="tab-content" style="height:calc(100% - 50px);overflow:auto;overflow-x: hidden;">
     <div role="tabpanel" class="tab-pane active" id="eqlogictab">
       <br/>
+	<div class="col-lg-8">
     <form class="form-horizontal">
         <fieldset>
             <div class="form-group">
                 <label class="col-sm-3 control-label">{{Nom de l'équipement}}</label>
-                <div class="col-sm-3">
+                <div class="col-sm-6">
                     <input type="text" class="eqLogicAttr form-control" data-l1key="id" style="display : none;" />
                     <input type="text" class="eqLogicAttr form-control" data-l1key="name" placeholder="{{Nom de l'équipement}}"/>
                 </div>
             </div>
             <div class="form-group">
                 <label class="col-sm-3 control-label" >{{Objet parent}}</label>
-                <div class="col-sm-3">
+                <div class="col-sm-6">
                     <select id="sel_object" class="eqLogicAttr form-control" data-l1key="object_id">
                         <option value="">{{Aucun}}</option>
                         <?php
@@ -97,7 +98,7 @@ foreach (object::all() as $object) {
            </div>
 	   <div class="form-group">
           <label class="col-sm-3 control-label">{{Catégorie}}</label>
-          <div class="col-sm-9">
+          <div class="col-sm-6">
            <?php
               foreach (jeedom::getConfiguration('eqLogic:category') as $key => $value) {
               echo '<label class="checkbox-inline">';
@@ -109,7 +110,7 @@ foreach (object::all() as $object) {
      </div>
 	<div class="form-group">
 		<label class="col-sm-3 control-label"></label>
-		<div class="col-sm-9">
+		<div class="col-sm-6">
 			<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isEnable" checked/>{{Activer}}</label>
 			<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked/>{{Visible}}</label>
 		</div>
@@ -117,78 +118,82 @@ foreach (object::all() as $object) {
 
   	<div class="form-group">
         <label class="col-sm-3 control-label">{{Identifiant}}</label>
-        <div class="col-sm-3">
+        <div class="col-sm-6">
 			      <input disabled class="eqLogicAttr configuration form-control" data-l1key="logicalId"/>
         </div>
     </div>
 		<div class="form-group">
 			 <label class="col-sm-3 control-label">{{Type}}</label>
-			 <div class="col-sm-3">
+			 <div class="col-sm-6">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="type"/>
 			 </div>
 		</div>
 		<div class="form-group">
 			 <label class="col-sm-3 control-label">{{Local IP}}</label>
-			 <div class="col-sm-3">
+			 <div class="col-sm-6">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="local_ip"/>
 			 </div>
 		</div>
 		<div class="form-group">
 			 <label class="col-sm-3 control-label">{{Local port}}</label>
-			 <div class="col-sm-3">
+			 <div class="col-sm-6">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="local_port"/>
 			 </div>
 		</div>
 		<div class="form-group">
 			 <label class="col-sm-3 control-label">{{Software version}}</label>
-			 <div class="col-sm-3">
+			 <div class="col-sm-6">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="sw_ver"/>
 			 </div>
 		</div>
 		<div class="form-group">
 			 <label class="col-sm-3 control-label">{{Device name}}</label>
-			 <div class="col-sm-3">
+			 <div class="col-sm-6">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="dev_name"/>
 			 </div>
 		</div>
 		<div class="form-group">
 			 <label class="col-sm-3 control-label">{{Model}}</label>
-			 <div class="col-sm-3">
+			 <div class="col-sm-6">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="model"/>
 			 </div>
 		</div>
 		<div class="form-group">
 			 <label class="col-sm-3 control-label">{{MAC}}</label>
-			 <div class="col-sm-3">
+			 <div class="col-sm-6">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="mac"/>
 			 </div>
 		</div>
 		<div class="form-group">
 			 <label class="col-sm-3 control-label">{{Hardware ID}}</label>
-			 <div class="col-sm-3">
+			 <div class="col-sm-6">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="hwId"/>
 			 </div>
 		</div>
 		<div class="form-group">
 			 <label class="col-sm-3 control-label">{{fwId}}</label>
-			 <div class="col-sm-3">
+			 <div class="col-sm-6">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="fwId"/>
 			 </div>
 		</div>
 		<div class="form-group">
 			 <label class="col-sm-3 control-label">{{OEM ID}}</label>
-			 <div class="col-sm-3">
+			 <div class="col-sm-6">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="oemId"/>
 			 </div>
 		</div>
 		<div class="form-group">
 			 <label class="col-sm-3 control-label">{{Hardware version}}</label>
-			 <div class="col-sm-3">
+			 <div class="col-sm-6">
 					<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="hw_ver"/>
 			 </div>
 		</div>
 </fieldset>
 </form>
+</div>
+<div class="col-lg-4">
+	niouf
+</div>
 </div>
       <div role="tabpanel" class="tab-pane" id="commandtab">
 <a class="btn btn-success btn-sm cmdAction pull-right" data-action="add" style="margin-top:5px;"><i class="fa fa-plus-circle"></i> {{Commandes}}</a><br/><br/>

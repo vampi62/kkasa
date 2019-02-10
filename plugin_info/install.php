@@ -44,6 +44,13 @@ function kkasa_update() {
     }
   }
 
+  if (version_compare($kkasa_version,'1.91','<'))
+  {
+    foreach (eqLogic::byType('kkasa') as $eqLogic) {
+      $eqLogic->addLedCmd();
+    }
+  }
+
   config::save('version',KKASA_VERSION,'kkasa');
 }
 
