@@ -55,6 +55,33 @@ function addCmdToTable(_cmd) {
     jeedom.cmd.changeType($('#table_cmd tbody tr:last'), init(_cmd.subType));
 }
 
+function kkasaCreateCmd(cmdType,force=0)
+{
+  $.ajax({
+      type: "POST",
+      url: "plugins/kkasa/core/ajax/kkasa.ajax.php",
+      data: {
+          action: "createCmd",
+          id: $('.eqLogicAttr[data-l1key=id]').value(),
+          createcommand: force,
+          cmdType: cmdType
+      },
+      dataType: 'json',
+      global: false,
+      error: function (request, status, error) {
+          handleAjaxError(request, status, error);
+      },
+      success: function (data) {
+          if (data.state != 'ok') {
+              $('#div_alert').showAlert({message: data.result, level: 'danger'});
+              return;
+          }
+          $('#div_alert').showAlert({message: '{{Opération réalisée avec succès}}', level: 'success'});
+          $('.li_eqLogic[data-eqLogic_id=' + $('.eqLogicAttr[data-l1key=id]').value() + ']').click();
+      }
+  });
+}
+
 $('#btSync').on('click', function () {
     $.ajax({// fonction permettant de faire de l'ajax
         type: "POST", // methode de transmission des données au fichier php
@@ -106,6 +133,50 @@ $('#btDebug').on('click', function () {
     });
 });
 
+$('.bt_kkasaCreateCmd').on('click', function () {
+  var cmdType = $(this).attr("dataCmdType");
+  var dialog_title = '{{Recharge configuration}}';
+  var dialog_message = '<form class="form-horizontal onsubmit="return false;"> ';
+  dialog_title = '{{Recharger la configuration}}';
+  dialog_message += '<label class="control-label" > {{Sélectionner le mode de rechargement de la configuration}} </label> ' +
+  '<div> <div class="radio"> <label > ' +
+  '<input type="radio" name="command" id="command-0" value="0" checked="checked"> {{Sans recréer les commandes mais en créeant les manquantes}} </label> ' +
+  '</div><div class="radio"> <label > ' +
+  '<input type="radio" name="command" id="command-1" value="1"> {{En recréant les commandes}}</label> ' +
+  '</div> ' +
+  '</div><br>' +
+  '<label class="lbl lbl-warning" for="name">{{Attention, "en recréant les commandes" va supprimer les commandes existantes.}}</label> ';
+  dialog_message += '</form>';
+  bootbox.dialog({
+    title: dialog_title,
+    message: dialog_message,
+    buttons: {
+      "{{Annuler}}": {
+        className: "btn-danger",
+        callback: function () {}
+      },
+      success: {
+        label: "Démarrer",
+        className: "btn-success",
+        callback: function () {
+          createCommand = $("input[name='command']:checked").val();
+          if (createCommand == "1")
+          {
+            bootbox.confirm('{{Etes-vous sûr de vouloir récréer les commandes ? Cela va supprimer les commandes existantes}}', function (result) {
+              if (result) {
+                kkasaCreateCmd(cmdType,force=1);
+              }
+            });
+          } else
+          {
+            kkasaCreateCmd(cmdType,force=0);
+          }
+        }
+      }
+    },
+  });
+});
+
 if (getUrlVars('syncedDevices') > 0) {
     $('#div_alert').showAlert(
       {message:
@@ -114,3 +185,22 @@ if (getUrlVars('syncedDevices') > 0) {
         , level: 'success'}
     );
 }
+
+function is_feature(feature) {
+  var strFeatures = $(".eqLogicAttr[data-l2key='features']").val();
+  return (strFeatures.indexOf(feature)>-1)
+}
+
+$(document).ready(function() {
+  $(".eqLogicAttr[data-l2key='features']").change(function(){
+    if ($(this).val()!='')
+      if(is_feature('ENE'))
+        $(".bt_kkasaCreateCmd[dataCmdType='power']").show();
+      else
+        $(".bt_kkasaCreateCmd[dataCmdType='power']").hide();
+      if(is_feature('LED'))
+        $(".bt_kkasaCreateCmd[dataCmdType='led']").show();
+      else
+        $(".bt_kkasaCreateCmd[dataCmdType='led']").hide();
+  });
+});

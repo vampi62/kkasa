@@ -110,7 +110,20 @@ class kkasa extends eqLogic {
 		}
 
 		public function isPowerAvailable() {
-			return (substr($this->getConfiguration('model'),0,5) == 'HS110');
+			$device = $this->getDevice();
+			return ($device->is_featured('ENE'));
+		}
+
+		public function featureString() {
+			$result = array();
+			$device = $this->getDevice();
+			if ($device->is_featured('TIM')) $result[] = 'TIM';
+			if ($device->is_featured('ENE')) $result[] = 'ENE';
+			if ($device->is_featured('LED')) $result[] = 'LED';
+			if ($device->is_featured('DIM')) $result[] = 'DIM';
+			if ($device->is_featured('TMP')) $result[] = 'TMP';
+			if ($device->is_featured('COL')) $result[] = 'COL';
+			return implode("|",$result);
 		}
 
     public static function cron() {
@@ -551,13 +564,18 @@ class kkasa extends eqLogic {
     }
 
     public function preSave() {
+			$this->setConfiguration('features',$this->featureString());
 
     }
 
-		public function addCmd($id,$type,$subtype=NULL,$name = NULL,$isVisible=NULL,$isHistorized=NULL,$unit=NULL,$generic_type=NULL)
+		public function addCmd($id,$type,$subtype=NULL,$name = NULL,$isVisible=NULL,$isHistorized=NULL,$unit=NULL,$generic_type=NULL,$force=0)
 		{
 			if (!isset($name)) $name = ucfirst($id);
 			$cmd = $this->getCmd(null, $id);
+			if ($force && is_object($cmd)) {
+				$cmd->remove();
+				$cmd = null;
+			}
 			if (!is_object($cmd)) {
 				$cmd = new kkasaCmd();
 				$cmd->setName(__($name, __FILE__));
@@ -573,34 +591,72 @@ class kkasa extends eqLogic {
 			$cmd->save();
 		}
 
-		public function addBasicCmd()
+		public function addBasicCmd($force=0)
 		{
-			$this->addCmd('state','info','binary',__('Etat',__FILE__),1,1,null,'ENERGY_STATE');
-			$this->addCmd('refresh','action','other',__('Rafraîchir',__FILE__),1);
-			$this->addCmd('on','action','other',__('On',__FILE__),1,null,null,'ENERGY_ON');
-			$this->addCmd('off','action','other',__('Off',__FILE__),1,null,null,'ENERGY_OFF');
-			$this->addCmd('rssi','info','numeric',__('Force signal',__FILE__),0,1,'dBm');
+			$this->addCmd('refresh','action','other',__('Rafraîchir',__FILE__),1,null,null,null,$force);
+			$this->addCmd('rssi','info','numeric',__('Force signal',__FILE__),0,1,'dBm',null,$force);
 		}
 
-		public function addPowerCmd()
+		public function addPlugCmd($force=0)
 		{
-			$this->addCmd('power','info','numeric',__('Puissance',__FILE__),1,1,'W','POWER');
-			$this->addCmd('voltage','info','numeric',__('Voltage',__FILE__),0,0,'V','VOLTAGE');
-			$this->addCmd('current','info','numeric',__('Intensité',__FILE__),0,0,'A',null);
-			$this->addCmd('consumption','info','numeric',__('Consommation',__FILE__),1,1,'WH','CONSUMPTION');
+			$this->addCmd('state','info','binary',__('Etat',__FILE__),1,1,null,'ENERGY_STATE',$force);
+			$this->addCmd('on','action','other',__('On',__FILE__),1,null,null,'ENERGY_ON',$force);
+			$this->addCmd('off','action','other',__('Off',__FILE__),1,null,null,'ENERGY_OFF',$force);
 		}
 
-		public function addLedCmd()
+		public function addPowerCmd($force=0)
 		{
-			$this->addCmd('ledState','info','binary',__('LED activée',__FILE__),0,0,null,'LIGHT_STATE');
-			$this->addCmd('toogleLed','action','other',__('Commuter LED',__FILE__),0,0,null,'LIGHT_TOGGLE');
+			$this->addCmd('power','info','numeric',__('Puissance',__FILE__),1,1,'W','POWER',$force);
+			$this->addCmd('voltage','info','numeric',__('Voltage',__FILE__),0,0,'V','VOLTAGE',$force);
+			$this->addCmd('current','info','numeric',__('Intensité',__FILE__),0,0,'A',null,$force);
+			$this->addCmd('consumption','info','numeric',__('Consommation',__FILE__),1,1,'WH','CONSUMPTION',$force);
+		}
+
+		public function addLedCmd($force=0)
+		{
+			$this->addCmd('ledState','info','binary',__('LED activée',__FILE__),0,0,null,'LIGHT_STATE',$force);
+			$this->addCmd('toogleLed','action','other',__('Commuter LED',__FILE__),0,0,null,'LIGHT_TOGGLE',$force);
+		}
+
+		public function addLightCmd($force=0)
+		{
+			//$this->addCmd('brighness','action','numeric',__('Intensité',__FILE__),1,0,'%','BRIGHTNESS',$force);
+		}
+
+		public function loadCmdFromConf() {
+			$filename = dirname(__FILE__) . '/../config/' . $this->getConfFilePath().'.json';
+			if (!is_file($filename)) {
+				return;
+			}
+			$device = is_json(file_get_contents($filename), array());
+			if (!is_array($device) || !isset($device['commands'])) {
+				return true;
+			}
+			$this->import($device);
+			sleep(1);
+			event::add('jeedom::alert', array(
+				'level' => 'warning',
+				'page' => 'kkasa',
+				'message' => '',
+			));
+		}
+
+		public function getConfFilePath()
+		{
+			return strtolower(substr($this->getConfiguration('model'),0,5));
 		}
 
     public function postSave() {
+			/*if ($this->getConfFilePath()=='hs100')
+			{
+				$this->loadCmdFromConf();
+				return;
+			}*/
 			$this->addBasicCmd();
+			if ($this->getConfiguration('type','')=='IOT.SMARTPLUGSWITCH')
+				$this->addPlugCmd();
 			if ($this->isPowerAvailable()) {
 				$this->addPowerCmd();
-				$this->addLedCmd();
 			}
 			$this->syncRealTime();
     }

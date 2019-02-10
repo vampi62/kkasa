@@ -1,0 +1,47 @@
+{
+    "name": "HS100",
+    "type": "IOT.SMARTPLUGSWITCH", 
+    "imglink": "hs100.jpg",
+    "commands": [
+        {
+            "name": "on",
+            "type": "action",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "value": "state",
+            "subtype": "other",
+            "display": {
+                "generic_type": "ENERGY_ON"
+            },
+            "template": {
+                "dashboard": "prise",
+                "mobile": "prise"
+            }
+        },
+        {
+            "name": "off",
+            "type": "action",
+            "isVisible": 1,
+            "isHistorized": 0,
+            "value": "state",
+            "subtype": "other",
+            "display": {
+                "generic_type": "LIGHT_OFF"
+            },
+            "template": {
+                "dashboard": "prise",
+                "mobile": "prise"
+            }
+        },
+        {
+            "name": "state",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 1,
+            "subtype": "binary",
+            "display": {
+                "generic_type": "LIGHT_STATE"
+            }
+        }
+    ]
+}

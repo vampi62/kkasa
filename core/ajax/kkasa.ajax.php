@@ -38,6 +38,25 @@ try {
   	} elseif(init('action') == 'debugInfo') {
       kkasa::getDebugInfo();
       ajax::success();
+    } elseif(init('action') == 'createCmd') {
+      $id = init('id');
+      $device = eqLogic::byId($id);
+      switch(init('cmdType'))
+      {
+        case 'basic':
+          $device->addBasicCmd(init('createcommand'));
+          break;
+        case 'power':
+          $device->addPowerCmd(init('createcommand'));
+          break;
+        case 'led':
+          $device->addLedCmd(init('createcommand'));
+          break;
+        default:
+          ajax::error(__('Type de commandes inconnu',__FILE__));
+      }
+
+      ajax::success();
     }
 
 
