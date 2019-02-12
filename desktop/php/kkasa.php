@@ -204,12 +204,17 @@ foreach ($eqLogics as $eqLogic) {
 							</div>
 							<div class="form-group">
 								<a class="btn btn-danger bt_kkasaCreateCmd" dataCmdType="basic">
-									<i class="fa fa-search"></i> {{Recharger commandes basiques}}
+									<i class="fa fa-search"></i> {{Recharger commandes Basiques}}
+								</a>
+							</div>
+							<div class="form-group">
+								<a class="btn btn-danger bt_kkasaCreateCmd" dataCmdType="plug">
+									<i class="fa fa-search"></i> {{Recharger commandes Prise}}
 								</a>
 							</div>
 							<div class="form-group">
 								<a class="btn btn-danger bt_kkasaCreateCmd" dataCmdType="power">
-									<i class="fa fa-search"></i> {{Recharger commandes énergie}}
+									<i class="fa fa-search"></i> {{Recharger commandes Energie}}
 								</a>
 							</div>
 							<div class="form-group">

@@ -1,0 +1,21 @@
+{
+    "commands": [
+        {
+            "name": "Force signal",
+            "logicalId": "rssi",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "subtype": "numeric",
+            "unite": "dBm"
+        },
+  			{
+  					"name": "Rafraîchir",
+  					"logicalId": "refresh",
+  					"type": "action",
+  					"isVisible": 0,
+  					"isRefreshCmd": 1,
+  					"subtype": "other"
+  			}
+    ]
+}

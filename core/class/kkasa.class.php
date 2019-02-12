@@ -364,8 +364,8 @@ class kkasa extends eqLogic {
 	  				$eqLogic->setIsVisible(1);
 	  				$eqLogic->setIsEnable(1);
 	  				$eqLogic->save();
+						$nb_devices++;
 	  			}
-					$nb_devices++;
 					$eqLogic->refreshWidget();
 				} catch(KKPA\Exceptions\KKPADeviceException $ex)
 				{
@@ -395,6 +395,7 @@ class kkasa extends eqLogic {
 				try
 				{
 		      $sysinfo = $device->getSysInfo();
+					$this->refresh();
 					//$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
 					$changed = $this->setInfo('state',$device->getState()) || $changed;
 					$changed = $this->setInfo('rssi',$sysinfo['rssi']) || $changed;
@@ -530,7 +531,7 @@ class kkasa extends eqLogic {
 					break;
 
 				case 'IOT.SMARTBULB':
-					switch ($this->getDevice()->getModel())
+					switch (substr($this->getConfiguration('model',''),0,5))
 					{
 						case 'LB100':
 							return 'lb100.jpg';
@@ -560,7 +561,13 @@ class kkasa extends eqLogic {
     }
 
     public function postInsert() {
-
+			$this->addBasicCmd();
+			if ($this->getConfiguration('type','')=='IOT.SMARTPLUGSWITCH')
+				$this->addPlugCmd();
+			if ($this->isPowerAvailable()) {
+				$this->addPowerCmd();
+			}
+			$this->syncRealTime();
     }
 
     public function preSave() {
@@ -593,15 +600,17 @@ class kkasa extends eqLogic {
 
 		public function addBasicCmd($force=0)
 		{
-			$this->addCmd('refresh','action','other',__('Rafraîchir',__FILE__),1,null,null,null,$force);
-			$this->addCmd('rssi','info','numeric',__('Force signal',__FILE__),0,1,'dBm',null,$force);
+			$this->loadCmdFromConf('basic',$force);
+			/*$this->addCmd('refresh','action','other',__('Rafraîchir',__FILE__),1,null,null,null,$force);
+			$this->addCmd('rssi','info','numeric',__('Force signal',__FILE__),0,1,'dBm',null,$force);*/
 		}
 
 		public function addPlugCmd($force=0)
 		{
-			$this->addCmd('state','info','binary',__('Etat',__FILE__),1,1,null,'ENERGY_STATE',$force);
+			$this->loadCmdFromConf('plug',$force);
+			/*$this->addCmd('state','info','binary',__('Etat',__FILE__),1,1,null,'ENERGY_STATE',$force);
 			$this->addCmd('on','action','other',__('On',__FILE__),1,null,null,'ENERGY_ON',$force);
-			$this->addCmd('off','action','other',__('Off',__FILE__),1,null,null,'ENERGY_OFF',$force);
+			$this->addCmd('off','action','other',__('Off',__FILE__),1,null,null,'ENERGY_OFF',$force);*/
 		}
 
 		public function addPowerCmd($force=0)
@@ -623,8 +632,8 @@ class kkasa extends eqLogic {
 			//$this->addCmd('brighness','action','numeric',__('Intensité',__FILE__),1,0,'%','BRIGHTNESS',$force);
 		}
 
-		public function loadCmdFromConf() {
-			$filename = dirname(__FILE__) . '/../config/' . $this->getConfFilePath().'.json';
+		public function loadCmdFromConf($cmdSet,$force=0) {
+			$filename = dirname(__FILE__) . '/../config/' . $cmdSet.'.json';
 			if (!is_file($filename)) {
 				return;
 			}
@@ -632,13 +641,39 @@ class kkasa extends eqLogic {
 			if (!is_array($device) || !isset($device['commands'])) {
 				return true;
 			}
-			$this->import($device);
-			sleep(1);
-			event::add('jeedom::alert', array(
-				'level' => 'warning',
-				'page' => 'kkasa',
-				'message' => '',
-			));
+			foreach($device['commands'] as $key => $cmd)
+			{
+				if (array_key_exists('logicalId',$cmd))
+					$id = $cmd['logicalId'];
+				else
+				{
+					if (array_key_exists('name',$cmd))
+						$id = $cmd['name'];
+					else {
+						$id = '';
+					}
+				}
+				$curCmd = $this->getCmd(null, $id);
+				if ($force==1 && is_object($curCmd)) {
+					$curCmd->remove();
+				} elseif (($force == 0) && is_object($curCmd)) {
+					unset($device['commands'][$key]);
+					continue;
+				}
+				if (array_key_exists('name',$cmd))
+					$cmd['name'] = __($cmd['name'],__FILE__);
+			}
+			$debug = array("before"=>array(),"after"=>array());
+			foreach ($this->getCmd() as $cmd) {
+				$debug['before'][] = $cmd->getLogicalId();
+			}
+			if (count($device['commands'])>0)
+			{
+				$this->import($device);
+			}
+			foreach ($this->getCmd() as $cmd) {
+				$debug['after'][] = $cmd->getLogicalId();
+			}
 		}
 
 		public function getConfFilePath()
@@ -647,18 +682,6 @@ class kkasa extends eqLogic {
 		}
 
     public function postSave() {
-			/*if ($this->getConfFilePath()=='hs100')
-			{
-				$this->loadCmdFromConf();
-				return;
-			}*/
-			$this->addBasicCmd();
-			if ($this->getConfiguration('type','')=='IOT.SMARTPLUGSWITCH')
-				$this->addPlugCmd();
-			if ($this->isPowerAvailable()) {
-				$this->addPowerCmd();
-			}
-			$this->syncRealTime();
     }
 
     public function preUpdate() {
@@ -701,12 +724,96 @@ class kkasa extends eqLogic {
 		{
 			$cmd = $this->getCmd(null,$cmd_name);
 			if (is_object($cmd)) {
+				$cmd->refresh();
 				$changed = $this->checkAndUpdateCmd($cmd_name, $value);
 				log::add('kkasa','debug','set: '.$cmd->getName().' to '. $value);
 				$cmd->event($value,null,0);
 				return $changed;
 			}
 			return false;
+		}
+
+		public function import($_configuration) {
+			$cmdClass = $this->getEqType_name() . 'Cmd';
+			if (isset($_configuration['configuration'])) {
+				foreach ($_configuration['configuration'] as $key => $value) {
+					$this->setConfiguration($key, $value);
+				}
+			}
+			if (isset($_configuration['category'])) {
+				foreach ($_configuration['category'] as $key => $value) {
+					$this->setCategory($key, $value);
+				}
+			}
+			$cmd_order = 0;
+			$link_cmds = array();
+			$link_actions = array();
+			$arrayToRemove = [];
+			if (isset($_configuration['commands'])) {
+				foreach ($_configuration['commands'] as $command) {
+					$cmd = null;
+					foreach ($this->getCmd() as $liste_cmd) {
+						if ((isset($command['logicalId']) && $liste_cmd->getLogicalId() == $command['logicalId'])
+						|| (isset($command['name']) && $liste_cmd->getName() == $command['name'])) {
+							$cmd = $liste_cmd;
+							break;
+						}
+					}
+					try {
+						if ($cmd === null || !is_object($cmd)) {
+							$cmd = new $cmdClass();
+							$cmd->setOrder($cmd_order);
+							$cmd->setEqLogic_id($this->getId());
+						} else {
+							$command['name'] = $cmd->getName();
+							if (isset($command['display'])) {
+								unset($command['display']);
+							}
+						}
+						utils::a2o($cmd, $command);
+						$cmd->setConfiguration('logicalId', $cmd->getLogicalId());
+						$cmd->save();
+						if (isset($command['value'])) {
+							$link_cmds[$cmd->getId()] = $command['value'];
+						}
+						if (isset($command['configuration']) && isset($command['configuration']['updateCmdId'])) {
+							$link_actions[$cmd->getId()] = $command['configuration']['updateCmdId'];
+						}
+						$cmd_order++;
+					} catch (Exception $exc) {
+						log::error('kkasa','error','Error importing '.$command['name']);
+						throw $exc;
+					}
+					$cmd->event('');
+				}
+			}
+			if (count($link_cmds) > 0) {
+				foreach ($this->getCmd() as $eqLogic_cmd) {
+					foreach ($link_cmds as $cmd_id => $link_cmd) {
+						if ($link_cmd == $eqLogic_cmd->getName()) {
+							$cmd = cmd::byId($cmd_id);
+							if (is_object($cmd)) {
+								$cmd->setValue($eqLogic_cmd->getId());
+								$cmd->save();
+							}
+						}
+					}
+				}
+			}
+			if (count($link_actions) > 0) {
+				foreach ($this->getCmd() as $eqLogic_cmd) {
+					foreach ($link_actions as $cmd_id => $link_action) {
+						if ($link_action == $eqLogic_cmd->getName()) {
+							$cmd = cmd::byId($cmd_id);
+							if (is_object($cmd)) {
+								$cmd->setConfiguration('updateCmdId', $eqLogic_cmd->getId());
+								$cmd->save();
+							}
+						}
+					}
+				}
+			}
+			$this->save();
 		}
 }
 

@@ -52,6 +52,9 @@ try {
         case 'led':
           $device->addLedCmd(init('createcommand'));
           break;
+        case 'plug':
+          $device->addPlugCmd(init('createcommand'));
+          break;
         default:
           ajax::error(__('Type de commandes inconnu',__FILE__));
       }
