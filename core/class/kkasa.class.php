@@ -159,7 +159,7 @@ class kkasa extends eqLogic {
  		 foreach (self::byType('kkasa') as $kkasa) {
  			 if ($kkasa->getIsEnable())
  			 {
-				 	$device = $this->getDevice();
+				 	$device = $kkasa->getDevice();
  					$sysinfo = $device->getSysInfo();
  					$kkasa->setConfiguration('sw_ver', $sysinfo['sw_ver']);
  					$kkasa->setConfiguration('fwId', $sysinfo['fwId']);
