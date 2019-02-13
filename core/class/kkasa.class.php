@@ -33,6 +33,13 @@ if (!class_exists('KKPA\Clients\KKPAApiClient')) {
 }
 
 class kkasa extends eqLogic {
+		const FEATURES = array(
+			"TIM" => 'plug',
+			"ENE" => 'power',
+			"LED" => 'led',
+			'DIM' => 'bulb'
+		);
+
     /*     * *************************Attributs****************************** */
     private static $_client = null;
     private $_device = null;
@@ -561,12 +568,13 @@ class kkasa extends eqLogic {
     }
 
     public function postInsert() {
-			$this->addBasicCmd();
+			$this->loadCmdFromConf('all');
+			/*$this->addBasicCmd();
 			if ($this->getConfiguration('type','')=='IOT.SMARTPLUGSWITCH')
 				$this->addPlugCmd();
 			if ($this->isPowerAvailable()) {
 				$this->addPowerCmd();
-			}
+			}*/
 			$this->syncRealTime();
     }
 
@@ -575,7 +583,7 @@ class kkasa extends eqLogic {
 
     }
 
-		public function addCmd($id,$type,$subtype=NULL,$name = NULL,$isVisible=NULL,$isHistorized=NULL,$unit=NULL,$generic_type=NULL,$force=0)
+		/*public function addCmd($id,$type,$subtype=NULL,$name = NULL,$isVisible=NULL,$isHistorized=NULL,$unit=NULL,$generic_type=NULL,$force=0)
 		{
 			if (!isset($name)) $name = ucfirst($id);
 			$cmd = $this->getCmd(null, $id);
@@ -596,84 +604,62 @@ class kkasa extends eqLogic {
 			$cmd->setType($type);
 			if (isset($subtype)) $cmd->setSubType($subtype);
 			$cmd->save();
-		}
+		}*/
 
-		public function addBasicCmd($force=0)
-		{
-			$this->loadCmdFromConf('basic',$force);
-			/*$this->addCmd('refresh','action','other',__('Rafraîchir',__FILE__),1,null,null,null,$force);
-			$this->addCmd('rssi','info','numeric',__('Force signal',__FILE__),0,1,'dBm',null,$force);*/
-		}
-
-		public function addPlugCmd($force=0)
-		{
-			$this->loadCmdFromConf('plug',$force);
-			/*$this->addCmd('state','info','binary',__('Etat',__FILE__),1,1,null,'ENERGY_STATE',$force);
-			$this->addCmd('on','action','other',__('On',__FILE__),1,null,null,'ENERGY_ON',$force);
-			$this->addCmd('off','action','other',__('Off',__FILE__),1,null,null,'ENERGY_OFF',$force);*/
-		}
-
-		public function addPowerCmd($force=0)
-		{
-			$this->addCmd('power','info','numeric',__('Puissance',__FILE__),1,1,'W','POWER',$force);
-			$this->addCmd('voltage','info','numeric',__('Voltage',__FILE__),0,0,'V','VOLTAGE',$force);
-			$this->addCmd('current','info','numeric',__('Intensité',__FILE__),0,0,'A',null,$force);
-			$this->addCmd('consumption','info','numeric',__('Consommation',__FILE__),1,1,'WH','CONSUMPTION',$force);
-		}
-
-		public function addLedCmd($force=0)
-		{
-			$this->addCmd('ledState','info','binary',__('LED activée',__FILE__),0,0,null,'LIGHT_STATE',$force);
-			$this->addCmd('toogleLed','action','other',__('Commuter LED',__FILE__),0,0,null,'LIGHT_TOGGLE',$force);
-		}
-
-		public function addLightCmd($force=0)
-		{
-			//$this->addCmd('brighness','action','numeric',__('Intensité',__FILE__),1,0,'%','BRIGHTNESS',$force);
-		}
-
-		public function loadCmdFromConf($cmdSet,$force=0) {
-			$filename = dirname(__FILE__) . '/../config/' . $cmdSet.'.json';
-			if (!is_file($filename)) {
-				return;
-			}
-			$device = is_json(file_get_contents($filename), array());
-			if (!is_array($device) || !isset($device['commands'])) {
-				return true;
-			}
-			foreach($device['commands'] as $key => $cmd)
-			{
-				if (array_key_exists('logicalId',$cmd))
-					$id = $cmd['logicalId'];
-				else
+		public function loadCmdFromConf($cmd='all',$force=0) {
+			log::add('kkasa','debug','Commandes à créer :'.$cmd);
+			$device = $this->getDevice();
+			if ($cmd!='all')
+				$cmdSets = array($cmd);
+			else {
+				$cmdSets = array('basic');
+				foreach(self::FEATURES as $feature => $cmdType)
 				{
-					if (array_key_exists('name',$cmd))
-						$id = $cmd['name'];
-					else {
-						$id = '';
-					}
+					if ($device->is_featured($feature))
+						$cmdSets[] = $cmdType;
 				}
-				$curCmd = $this->getCmd(null, $id);
-				if ($force==1 && is_object($curCmd)) {
-					$curCmd->remove();
-				} elseif (($force == 0) && is_object($curCmd)) {
-					unset($device['commands'][$key]);
-					continue;
-				}
-				if (array_key_exists('name',$cmd))
-					$cmd['name'] = __($cmd['name'],__FILE__);
 			}
-			$debug = array("before"=>array(),"after"=>array());
-			foreach ($this->getCmd() as $cmd) {
-				$debug['before'][] = $cmd->getLogicalId();
-			}
-			if (count($device['commands'])>0)
+			log::add('kkasa','debug','Commandes qui seront créées :'.print_r($cmdSets,true));
+			$nb_cmd = 0;
+			foreach($cmdSets as $cmdSet)
 			{
-				$this->import($device);
+				$filename = dirname(__FILE__) . '/../config/' . $cmdSet.'.json';
+				if (!is_file($filename)) {
+					throw new \Exception("File $filename does not exist");
+				}
+				$device = is_json(file_get_contents($filename), array());
+				if (!is_array($device) || !isset($device['commands'])) {
+					break;
+				}
+				foreach($device['commands'] as $key => $cmd)
+				{
+					if (array_key_exists('logicalId',$cmd))
+						$id = $cmd['logicalId'];
+					else
+					{
+						if (array_key_exists('name',$cmd))
+							$id = $cmd['name'];
+						else {
+							$id = '';
+						}
+					}
+					$curCmd = $this->getCmd(null, $id);
+					if ($force==1 && is_object($curCmd)) {
+						$curCmd->remove();
+					} elseif (($force == 0) && is_object($curCmd)) {
+						unset($device['commands'][$key]);
+						continue;
+					}
+					if (array_key_exists('name',$cmd))
+						$cmd['name'] = __($cmd['name'],__FILE__);
+				}
+				if (count($device['commands'])>0)
+				{
+					$this->import($device);
+				}
+				$nb_cmd += count($device['commands']);
 			}
-			foreach ($this->getCmd() as $cmd) {
-				$debug['after'][] = $cmd->getLogicalId();
-			}
+			return $nb_cmd;
 		}
 
 		public function getConfFilePath()

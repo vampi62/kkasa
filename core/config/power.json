@@ -1,0 +1,46 @@
+{
+    "commands": [
+        {
+            "name": "Puissance",
+            "logicalId": "power",
+            "type": "info",
+            "isVisible": 1,
+            "isHistorized": 1,
+            "subtype": "numeric",
+            "unite": "W",
+            "display": {
+                "generic_type": "POWER"
+            }
+        },
+        {
+            "name": "Voltage",
+            "logicalId": "voltage",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "subtype": "numeric",
+            "unite": "V",
+            "display": {
+                "generic_type": "VOLTAGE"
+            }
+        },
+        {
+            "name": "Intensité",
+            "logicalId": "current",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "subtype": "numeric",
+            "unite": "A"
+        },
+        {
+            "name": "Consommation",
+            "logicalId": "consumption",
+            "type": "info",
+            "isVisible": 1,
+            "isHistorized": 1,
+            "subtype": "numeric",
+            "unite": "WH"
+        }
+    ]
+}

@@ -26,7 +26,7 @@ function addCmdToTable(_cmd) {
     if (!isset(_cmd.configuration)) {
         _cmd.configuration = {};
     }
-    var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
+    var tr = '<tr class="cmd cmdKkasa" data-cmd_id="' + init(_cmd.id) + '">';
     tr += '<td>';
     tr += '<span class="cmdAttr" data-l1key="id" style="display:none;"></span>';
     tr += '<input class="cmdAttr form-control input-sm" data-l1key="name" style="width : 140px;" placeholder="{{Nom}}">';
@@ -193,9 +193,27 @@ function is_feature(feature) {
   return (strFeatures.indexOf(feature)>-1)
 }
 
+function show_hide_create_cmd_button(feature,cmdType)
+{
+  if(is_feature(feature))
+    $(".bt_kkasaCreateCmd[dataCmdType='" + String(cmdType) + "']").show();
+  else
+    $(".bt_kkasaCreateCmd[dataCmdType='" + String(cmdType) + "']").hide();
+}
+
 $(document).ready(function() {
   $(".eqLogicAttr[data-l2key='features']").change(function(){
     if ($(this).val()!='')
+    {
+      show_hide_create_cmd_button('TIM','plug');
+      show_hide_create_cmd_button('ENE','power');
+      show_hide_create_cmd_button('LED','led');
+      show_hide_create_cmd_button('DIM','bulb');
+
+      /*if(is_feature('TIM'))
+        $(".bt_kkasaCreateCmd[dataCmdType='plug']").show();
+      else
+        $(".bt_kkasaCreateCmd[dataCmdType='plug']").hide();
       if(is_feature('ENE'))
         $(".bt_kkasaCreateCmd[dataCmdType='power']").show();
       else
@@ -203,6 +221,7 @@ $(document).ready(function() {
       if(is_feature('LED'))
         $(".bt_kkasaCreateCmd[dataCmdType='led']").show();
       else
-        $(".bt_kkasaCreateCmd[dataCmdType='led']").hide();
+        $(".bt_kkasaCreateCmd[dataCmdType='led']").hide();*/
+    }
   });
 });

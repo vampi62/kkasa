@@ -41,25 +41,11 @@ try {
     } elseif(init('action') == 'createCmd') {
       $id = init('id');
       $device = eqLogic::byId($id);
-      switch(init('cmdType'))
-      {
-        case 'basic':
-          $device->addBasicCmd(init('createcommand'));
-          break;
-        case 'power':
-          $device->addPowerCmd(init('createcommand'));
-          break;
-        case 'led':
-          $device->addLedCmd(init('createcommand'));
-          break;
-        case 'plug':
-          $device->addPlugCmd(init('createcommand'));
-          break;
-        default:
-          ajax::error(__('Type de commandes inconnu',__FILE__));
-      }
-
-      ajax::success();
+      $nb_cmd = $device->loadCmdFromConf(init('cmdType'),init('createcommand'));
+      if ($nb_cmd < 0)
+        ajax::error(__("Erreur durant l'ajout des commandes",__FILE__));
+      else
+        ajax::success("Cool");
     }
 
 

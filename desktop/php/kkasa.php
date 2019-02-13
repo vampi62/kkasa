@@ -2,11 +2,12 @@
 if (!isConnect('admin')) {
 	throw new Exception('{{401 - Accès non autorisé}}');
 }
+include_file('plugins/kkasa/desktop', 'kkasa', 'css');
+
 $plugin = plugin::byId('kkasa');
 sendVarToJS('eqType', $plugin->getId());
 $eqLogics = eqLogic::byType($plugin->getId());
 ?>
-
 <div class="row row-overflow">
     <div class="col-lg-2 col-md-3 col-sm-4">
         <div class="bs-sidebar">
@@ -203,6 +204,11 @@ foreach ($eqLogics as $eqLogic) {
 								<label class="control-label">{{Recharger les commandes}}</label>
 							</div>
 							<div class="form-group">
+								<a class="btn btn-danger bt_kkasaCreateCmd" dataCmdType="all">
+									<i class="fa fa-search"></i> {{Charger toutes les commandes}}
+								</a>
+							</div>
+							<div class="form-group">
 								<a class="btn btn-danger bt_kkasaCreateCmd" dataCmdType="basic">
 									<i class="fa fa-search"></i> {{Recharger commandes Basiques}}
 								</a>
@@ -220,6 +226,11 @@ foreach ($eqLogics as $eqLogic) {
 							<div class="form-group">
 								<a class="btn btn-danger bt_kkasaCreateCmd" dataCmdType="led">
 									<i class="fa fa-search"></i> {{Recharger commandes LED}}
+								</a>
+							</div>
+							<div class="form-group">
+								<a class="btn btn-danger bt_kkasaCreateCmd" dataCmdType="bulb">
+									<i class="fa fa-search"></i> {{Recharger commandes lumière}}
 								</a>
 							</div>
 						</fieldset>
