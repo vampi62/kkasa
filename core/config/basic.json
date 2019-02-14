@@ -7,13 +7,17 @@
             "isVisible": 0,
             "isHistorized": 0,
             "subtype": "numeric",
-            "unite": "dBm"
+            "unite": "dBm",
+            "configuration": {
+                "minValue": -90,
+                "maxValue": -30
+            }
         },
   			{
   					"name": "Rafraîchir",
   					"logicalId": "refresh",
   					"type": "action",
-  					"isVisible": 0,
+  					"isVisible": 1,
   					"isRefreshCmd": 1,
   					"subtype": "other"
   			}

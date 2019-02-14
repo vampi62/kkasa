@@ -209,6 +209,8 @@ $(document).ready(function() {
       show_hide_create_cmd_button('ENE','power');
       show_hide_create_cmd_button('LED','led');
       show_hide_create_cmd_button('DIM','bulb');
+      show_hide_create_cmd_button('TMP','temp');
+      show_hide_create_cmd_button('COL','color');
 
       /*if(is_feature('TIM'))
         $(".bt_kkasaCreateCmd[dataCmdType='plug']").show();

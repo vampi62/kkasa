@@ -37,7 +37,7 @@
             "name": "Consommation",
             "logicalId": "consumption",
             "type": "info",
-            "isVisible": 1,
+            "isVisible": 0,
             "isHistorized": 1,
             "subtype": "numeric",
             "unite": "WH"

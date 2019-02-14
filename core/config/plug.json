@@ -31,7 +31,7 @@
             }
         },
         {
-            "name": "State",
+            "name": "Etat",
             "logicalId": "state",
             "type": "info",
             "isVisible": 0,

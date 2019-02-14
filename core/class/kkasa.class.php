@@ -18,6 +18,7 @@
 
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
+define('KKASA_COLOR_LIB',__DIR__.'/../../3rparty/phpColors/Color.php');
 define('KKPA_MIN_VERSION','2.0');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
@@ -31,13 +32,21 @@ if (!class_exists('KKPA\Clients\KKPAApiClient')) {
 		require_once(dirname(__FILE__) . '/../../3rparty/KKPA/autoload.php');
 	}
 }
+if (!class_exists('Mexitek\PHPColors\Color')) {
+	if (file_exists(KKASA_COLOR_LIB))
+	{
+		require_once(KKASA_COLOR_LIB);
+	}
+}
 
 class kkasa extends eqLogic {
 		const FEATURES = array(
 			"TIM" => 'plug',
 			"ENE" => 'power',
 			"LED" => 'led',
-			'DIM' => 'bulb'
+			'DIM' => 'bulb',
+			'TMP' => 'temp',
+			'COL' => 'color'
 		);
 
     /*     * *************************Attributs****************************** */
@@ -211,6 +220,8 @@ class kkasa extends eqLogic {
    		} else {
    			$return['state'] = 'nok';
    		}
+			if ($return['state']=='ok' && !file_exists(KKASA_COLOR_LIB))
+				$return['state'] = 'nok';
 			log::add(__CLASS__,'debug','Dependancy_info: '.print_r($return,true));
    		return $return;
    	}
@@ -458,6 +469,30 @@ class kkasa extends eqLogic {
 								$changed = $this->setInfo($cmd_name,$value) || $changed;
 						}
 					}
+
+					if ($device->is_featured('DIM'))
+					{
+						if ($device->getState()==1)
+							$changed = $this->setInfo('brightness',$device->getBrightness()) || $changed;
+						else {
+							$changed = $this->setInfo('brightness',0) || $changed;
+						}
+					}
+
+					if ($device->is_featured('TMP'))
+					{
+						$lightState = $device->getLightState();
+						$changed = $this->setInfo('color_temp',$lightState['color_temp']) || $changed;
+					}
+
+					if ($device->is_featured('COL'))
+					{
+						$lightState = $device->getLightState();
+						$hsl = array("H" => $lightState['hue'], "S" => $lightState['saturation']/100, "L" => 0.5);
+						$hex = '#'.Mexitek\PHPColors\Color::hslToHex($hsl);
+						$changed = $this->setInfo('colorState',$hex) || $changed;
+					}
+
 					$success = true;
 
 					if ($changed) {
@@ -473,6 +508,103 @@ class kkasa extends eqLogic {
 				}
 			}
 
+		}
+
+		public function setColor($hex)
+		{
+			$device = $this->getDevice();
+			$success = false;
+			$attempt = 0;
+			while ((!$success) && $attempt < 3)
+			{
+				try
+				{
+					$temp = 0;
+					$hsl = Mexitek\PHPColors\Color::hexToHsl($hex);
+					$hue = max(0,min(360,intval($hsl['H'])));
+					$saturation = max(0,min(100,intval($hsl['S']*100)));
+					$device->setLightState($temp,$hue,$saturation,null);
+					$this->setInfo('color_temp',0);
+					sleep(1.5);
+					$this->syncRealTime();
+					$success = true;
+				}
+				catch(Exception $ex)
+				{
+					$attempt++;
+					log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
+					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+					if ($attempt > 2) throw $ex;
+				}
+			}
+		}
+
+		public function setTempColor($temp)
+		{
+			$device = $this->getDevice();
+			$success = false;
+			$attempt = 0;
+			while ((!$success) && $attempt < 3)
+			{
+				try
+				{
+					$temp = min(6500,max(2700,intval($temp)));
+					$hue = 0;
+					$saturation = 0;
+					$brightness = null;
+					$device->setLightState($temp,$hue,$saturation,$brightness);
+					$this->setInfo('color','#ffffff');
+					sleep(1.5);
+					$this->syncRealTime();
+					$success = true;
+				}
+				catch(Exception $ex)
+				{
+					$attempt++;
+					log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
+					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+					if ($attempt > 2) throw $ex;
+				}
+			}
+		}
+
+		public function setBrightness($level)
+		{
+			$device = $this->getDevice();
+			$success = false;
+			$attempt = 0;
+			while ((!$success) && $attempt < 3)
+			{
+				try
+				{
+					$level = max(0,min(100,intval($level)));
+					if ($level>0)
+					{
+						$color_temp = null;
+						$hue = null;
+						$saturation = null;
+						$brightness = $level;
+						$device->switchOn();
+						sleep(0.1);
+						$device->setLightState($color_temp,$hue,$saturation,$brightness);
+						/*
+						sleep(0.1);
+						$device->setBrightness($level);*/
+					} else {
+						$device->switchOff();
+					}
+					sleep(1.5);
+					$this->syncRealTime();
+					$success = true;
+				}
+				catch(Exception $ex)
+				{
+					$attempt++;
+					log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
+					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+					if ($attempt > 2) throw $ex;
+				}
+			}
 		}
 
 		public function setState($state)
@@ -569,12 +701,6 @@ class kkasa extends eqLogic {
 
     public function postInsert() {
 			$this->loadCmdFromConf('all');
-			/*$this->addBasicCmd();
-			if ($this->getConfiguration('type','')=='IOT.SMARTPLUGSWITCH')
-				$this->addPlugCmd();
-			if ($this->isPowerAvailable()) {
-				$this->addPowerCmd();
-			}*/
 			$this->syncRealTime();
     }
 
@@ -583,31 +709,7 @@ class kkasa extends eqLogic {
 
     }
 
-		/*public function addCmd($id,$type,$subtype=NULL,$name = NULL,$isVisible=NULL,$isHistorized=NULL,$unit=NULL,$generic_type=NULL,$force=0)
-		{
-			if (!isset($name)) $name = ucfirst($id);
-			$cmd = $this->getCmd(null, $id);
-			if ($force && is_object($cmd)) {
-				$cmd->remove();
-				$cmd = null;
-			}
-			if (!is_object($cmd)) {
-				$cmd = new kkasaCmd();
-				$cmd->setName(__($name, __FILE__));
-				if (isset($isVisible)) $cmd->setIsVisible($isVisible);
-				if (isset($isHistorized)) $cmd->setIsHistorized($isHistorized);
-				if (isset($generic_type)) $cmd->setDisplay('generic_type', $generic_type);
-				if (isset($unit)) $cmd->setUnite($unit);
-			}
-			$cmd->setEqLogic_id($this->getId());
-			$cmd->setLogicalId($id);
-			$cmd->setType($type);
-			if (isset($subtype)) $cmd->setSubType($subtype);
-			$cmd->save();
-		}*/
-
 		public function loadCmdFromConf($cmd='all',$force=0) {
-			log::add('kkasa','debug','Commandes à créer :'.$cmd);
 			$device = $this->getDevice();
 			if ($cmd!='all')
 				$cmdSets = array($cmd);
@@ -619,7 +721,6 @@ class kkasa extends eqLogic {
 						$cmdSets[] = $cmdType;
 				}
 			}
-			log::add('kkasa','debug','Commandes qui seront créées :'.print_r($cmdSets,true));
 			$nb_cmd = 0;
 			foreach($cmdSets as $cmdSet)
 			{
@@ -719,6 +820,16 @@ class kkasa extends eqLogic {
 			return false;
 		}
 
+		public function getInfo($cmd_name,$default=null)
+		{
+			$cmd = $this->getCmd(null,$cmd_name);
+			if (is_object($cmd)) {
+				$cmd->refresh();
+				return $cmd->getValue();
+			}
+			return $default;
+		}
+
 		public function import($_configuration) {
 			$cmdClass = $this->getEqType_name() . 'Cmd';
 			if (isset($_configuration['configuration'])) {
@@ -732,6 +843,11 @@ class kkasa extends eqLogic {
 				}
 			}
 			$cmd_order = 0;
+			foreach($this->getCmd() as $liste_cmd)
+			{
+				if ($liste_cmd->getOrder()>$cmd_order)
+					$cmd_order = $liste_cmd->getOrder()+1;
+			}
 			$link_cmds = array();
 			$link_actions = array();
 			$arrayToRemove = [];
@@ -776,7 +892,7 @@ class kkasa extends eqLogic {
 			if (count($link_cmds) > 0) {
 				foreach ($this->getCmd() as $eqLogic_cmd) {
 					foreach ($link_cmds as $cmd_id => $link_cmd) {
-						if ($link_cmd == $eqLogic_cmd->getName()) {
+						if ($link_cmd == $eqLogic_cmd->getLogicalId()) { // diff kkasa
 							$cmd = cmd::byId($cmd_id);
 							if (is_object($cmd)) {
 								$cmd->setValue($eqLogic_cmd->getId());
@@ -838,6 +954,21 @@ class kkasaCmd extends cmd {
 			}
 			if ($this->getLogicalId() == 'toogleLed') {
 				$eqLogic->toogleLedState();
+			}
+			if ($this->getLogicalId() == 'lightOn') {
+				$eqLogic->setState(1);
+			}
+			if ($this->getLogicalId() == 'lightOff') {
+				$eqLogic->setState(0);
+			}
+			if ($this->getLogicalId() == 'setBrightness') {
+				$eqLogic->setBrightness($_options['slider']);
+			}
+			if ($this->getLogicalId() == 'setColorTemp') {
+				$eqLogic->setTempColor($_options['slider']);
+			}
+			if ($this->getLogicalId() == 'color') {
+				$eqLogic->setColor($_options['color']);
 			}
 
 

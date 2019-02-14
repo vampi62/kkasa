@@ -1,0 +1,38 @@
+{
+    "commands": [
+      {
+        "logicalId":"color_temp",
+        "name":"Température de blanc",
+        "type":"info",
+        "subType":"numeric",
+        "unite":"K",
+        "isVisible":0,
+        "isHistorized":1,
+        "configuration":
+        {
+          "maxValue":6500,
+          "minValue":2700
+        },
+        "display":
+        {
+          "generic_type":"LIGHT_COLOR"
+        },
+        "unite": "K"
+      },
+      {
+        "logicalId":"setColorTemp",
+        "name":"Régler temp blanc",
+        "type":"action",
+        "subType":"slider",
+        "value":"color_temp",
+        "isVisible":1,
+        "configuration":{
+          "maxValue":6500,
+          "minValue":2700
+        },
+        "display":{
+          "generic_type":"LIGHT_SET_COLOR_TEMP"
+        }
+      }
+    ]
+}

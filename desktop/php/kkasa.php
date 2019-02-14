@@ -233,6 +233,16 @@ foreach ($eqLogics as $eqLogic) {
 									<i class="fa fa-search"></i> {{Recharger commandes lumière}}
 								</a>
 							</div>
+							<div class="form-group">
+								<a class="btn btn-danger bt_kkasaCreateCmd" dataCmdType="temp">
+									<i class="fa fa-search"></i> {{Recharger commandes température}}
+								</a>
+							</div>
+							<div class="form-group">
+								<a class="btn btn-danger bt_kkasaCreateCmd" dataCmdType="color">
+									<i class="fa fa-search"></i> {{Recharger commandes couleur}}
+								</a>
+							</div>
 						</fieldset>
 					</form>
 				</div>
