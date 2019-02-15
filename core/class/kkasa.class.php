@@ -63,15 +63,17 @@ class kkasa extends eqLogic {
           'cloud' => config::byKey('cloud', 'kkasa'),
         ));
       }
-      try
-      {
-        self::$_client->getAccessToken();
-      }
-      catch(KKPA\Exceptions\KKPAClientException $ex)
-      {
-        $error_msg = "An error happened  while trying to retrieve your tokens \n" . $ex->getMessage() . "\n";
-        log::add('kkasa', 'debug', $error_msg);
-      }
+			if (config::byKey('cloud', 'kkasa')==1) {
+	      try
+	      {
+	        self::$_client->getAccessToken();
+	      }
+	      catch(KKPA\Exceptions\KKPAClientException $ex)
+	      {
+	        $error_msg = "An error happened  while trying to retrieve your tokens \n" . $ex->getMessage() . "\n";
+	        log::add('kkasa', 'debug', $error_msg);
+	      }
+			}
       return self::$_client;
     }
 
@@ -101,27 +103,53 @@ class kkasa extends eqLogic {
 
 		public function getDevice() {
 			if ($this->_device == null) {
-				$conf = array(
+				/*$conf = array(
           'username' => config::byKey('username', 'kkasa'),
           'password' => config::byKey('password', 'kkasa'),
 					'deviceId' => $this->getLogicalId(),
           'cloud' => config::byKey('cloud', 'kkasa'),
           'local_ip' => $this->getConfiguration('local_ip'),
           'local_port' => $this->getConfiguration('local_port',9999)
-				);
-				switch ($this->getConfiguration("type"))
-				{
-					case 'IOT.SMARTBULB':
-						$this->_device =  new KKPA\Clients\KKPABulbApiClient($conf);
-						break;
-					case 'IOT.SMARTPLUGSWITCH':
-						if (substr($this->getConfiguration("model"),0,5)=='HS300')
-							$this->_device =  new KKPA\Clients\KKPAMultiPlugApiClient($conf);
-						else
-							$this->_device =  new KKPA\Clients\KKPAPlugApiClient($conf);
-						break;
+				);*/
+				$client = self::getClient();
+				if (config::byKey('cloud', 'kkasa')==1) {
+					$this->_device = $client->getDeviceById($this->getLogicalId());
+				} else {
+					try {
+						$this->_device = $client->getDeviceByIp(
+							$this->getConfiguration('local_ip'),
+							$this->getConfiguration('local_port',9999)
+						);
+						/*switch ($this->getConfiguration("type"))
+						{
+							case 'IOT.SMARTBULB':
+								$this->_device =  new KKPA\Clients\KKPABulbApiClient($conf);
+								break;
+							case 'IOT.SMARTPLUGSWITCH':
+								if (substr($this->getConfiguration("model"),0,5)=='HS300')
+									$this->_device =  new KKPA\Clients\KKPAMultiPlugApiClient($conf);
+								else
+									$this->_device =  new KKPA\Clients\KKPAPlugApiClient($conf);
+								break;
+						}*/
+					} catch (KKPA\Exceptions\KKPAClientException $ex) {
+						if ($ex->getCode()==KKPA_NO_ROUTE_TO_HOST) {
+							log::add('kkasa','Info',"Cannot reach $local_ip. Trying to autodetect IP of ".$this->getLogicalId());
+							$this->_device = $client->getDeviceById($this->getLogicalId());
+							if (is_object($this->_device)) {
+								$local_ip = $this->_device->getVariable('local_ip','');
+								log::add('kkasa','Info',"IP found: $local_ip. Updating");
+								if ($local_ip!='') {
+									$this->setConfiguration("local_ip",$local_ip);
+									$this->save();
+								}
+							}
+						} else {
+							throw $ex;
+						}
+					}
 				}
-      }
+			}
 			return $this->_device;
 		}
 
@@ -168,7 +196,7 @@ class kkasa extends eqLogic {
     }
 
 		public static function cronDaily() {
- 		 if (config::byKey('cron_freq','kkasa','15')=='3600')
+ 		 if (strval(config::byKey('cron_freq','kkasa','15'))=='3600')
  		 		self::cronExec();
 
 		 // Once a day: update the firmware version
@@ -237,7 +265,15 @@ class kkasa extends eqLogic {
 
 		public static function health() {
 			$return = array();
+			$return[] = self::health_kkasa_version();
+			$return[] = self::health_kkpa_version();
+			$return[] = self::health_kasa_crendentials();
+			$return[] = self::health_offline_plugs(end($return)['state']);
+			return $return;
+		}
 
+		protected static function health_kkasa_version()
+		{
 			$update = update::byLogicalId('kkasa');
 			if (is_object($update))
 			{
@@ -246,13 +282,16 @@ class kkasa extends eqLogic {
 				$state = 'KO';
 			}
 
-			$return[] = array(
+			return array(
 				'test' => __('Version KKASA', __FILE__),
 				'result' => KKASA_VERSION,
 				'advice' => ($state == 'OK') ? '' : __('Mettre à jour le plugin',__FILE__),
 				'state' => $state,
 			);
+		}
 
+		protected static function health_kkpa_version()
+		{
 			try {
 				if (class_exists('KKPA\Clients\KKPAApiClient'))
 					$kkpa_version = KKPA\Clients\KKPAApiClient::getVersion();
@@ -264,35 +303,51 @@ class kkasa extends eqLogic {
 				$kkpa_version = 'KO';
 			}
 			$result = strtoupper(self::dependancy_info()['state']);
-			$return[] = array(
+			return array(
 				'test' => __('Version KKPA', __FILE__),
 				'result' => $kkpa_version,
 				'advice' => ($result == 'OK') ? '' : __('(ré)Installer les dépendance dans la configuration du plugin',__FILE__),
 				'state' => ($result == 'OK'),
 			);
+		}
 
+		protected static function health_kasa_crendentials()
+		{
+			if (intval(config::byKey('cloud', 'kkasa'))==0)
+			{
+				return array(
+					'test' => __('Identification Kasa', __FILE__),
+					'result' => "N/A",
+					'advice' => __('Mode local : inutile',__FILE__),
+					'state' => true,
+				);
+			}
 			try
-      {
+			{
 				if (class_exists('KKPA\Clients\KKPAApiClient'))
 				{
-	        $client = self::getClient();
+					$client = self::getClient();
 					$client->getAccessToken();
 					$state = true;
 				} else {
 					$state = false;
 				}
-      }
-      catch(KKPA\Exceptions\KKPAClientException $ex)
-      {
+			}
+			catch(KKPA\Exceptions\KKPAClientException $ex)
+			{
 				$state = false;
-      }
-			$return[] = array(
+			}
+			return array(
 				'test' => __('Identification Kasa', __FILE__),
 				'result' => ($state) ? "OK" : "NOK",
 				'advice' => ($state) ? '' : __('Vérifier vos identifiants Kasa dans la configuration du plugin',__FILE__),
 				'state' => $state,
 			);
+		}
 
+		protected static function health_offline_plugs($state)
+		{
+			$client = self::getClient();
 			$nb_offline = 0;
 			if ($state)
 			{
@@ -310,14 +365,12 @@ class kkasa extends eqLogic {
 				}
 				$state = ($nb_offline == 0);
 			}
-			$return[] = array(
+			return array(
 				'test' => __('Prises hors ligne', __FILE__),
 				'result' => $nb_offline,
 				'advice' => ($state) ? '' : __('Vérifiez que vos prises sont connectées au wifi',__FILE__),
 				'state' => $state,
 			);
-
-			return $return;
 		}
 
     public static function syncWithKasa() {
@@ -325,12 +378,7 @@ class kkasa extends eqLogic {
   		$devicelist = $client->getDeviceList();
 			$nb_devices = 0;
   		foreach ($devicelist as $device) {
-				if (method_exists($device,'toString')) // Retrocompatibility. To be removed after
-				{
-					log::add(__CLASS__, 'debug',$device->toString());
-				} else {
-					log::add(__CLASS__, 'debug', print_r($device, true));
-				}
+				log::add(__CLASS__, 'debug',$device->toString());
 				try
 				{
 	        $sysinfo     = $device->getSysInfo();
@@ -519,7 +567,7 @@ class kkasa extends eqLogic {
 			{
 				try
 				{
-					$temp = 0;
+					$temp = ($device->is_featured('TMP')) ? 0 : null;
 					$hsl = Mexitek\PHPColors\Color::hexToHsl($hex);
 					$hue = max(0,min(360,intval($hsl['H'])));
 					$saturation = max(0,min(100,intval($hsl['S']*100)));
@@ -549,8 +597,8 @@ class kkasa extends eqLogic {
 				try
 				{
 					$temp = min(6500,max(2700,intval($temp)));
-					$hue = 0;
-					$saturation = 0;
+					$hue = ($device->is_featured('COL')) ? 0 : null;
+					$saturation = ($device->is_featured('COL')) ? 0 : null;
 					$brightness = null;
 					$device->setLightState($temp,$hue,$saturation,$brightness);
 					$this->setInfo('color','#ffffff');
