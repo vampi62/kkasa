@@ -103,14 +103,6 @@ class kkasa extends eqLogic {
 
 		public function getDevice() {
 			if ($this->_device == null) {
-				/*$conf = array(
-          'username' => config::byKey('username', 'kkasa'),
-          'password' => config::byKey('password', 'kkasa'),
-					'deviceId' => $this->getLogicalId(),
-          'cloud' => config::byKey('cloud', 'kkasa'),
-          'local_ip' => $this->getConfiguration('local_ip'),
-          'local_port' => $this->getConfiguration('local_port',9999)
-				);*/
 				$client = self::getClient();
 				if (config::byKey('cloud', 'kkasa')==1) {
 					$this->_device = $client->getDeviceById($this->getLogicalId());
@@ -120,27 +112,17 @@ class kkasa extends eqLogic {
 							$this->getConfiguration('local_ip'),
 							$this->getConfiguration('local_port',9999)
 						);
-						/*switch ($this->getConfiguration("type"))
-						{
-							case 'IOT.SMARTBULB':
-								$this->_device =  new KKPA\Clients\KKPABulbApiClient($conf);
-								break;
-							case 'IOT.SMARTPLUGSWITCH':
-								if (substr($this->getConfiguration("model"),0,5)=='HS300')
-									$this->_device =  new KKPA\Clients\KKPAMultiPlugApiClient($conf);
-								else
-									$this->_device =  new KKPA\Clients\KKPAPlugApiClient($conf);
-								break;
-						}*/
 					} catch (KKPA\Exceptions\KKPAClientException $ex) {
 						if ($ex->getCode()==KKPA_NO_ROUTE_TO_HOST) {
 							log::add('kkasa','Info',"Cannot reach $local_ip. Trying to autodetect IP of ".$this->getLogicalId());
 							$this->_device = $client->getDeviceById($this->getLogicalId());
 							if (is_object($this->_device)) {
 								$local_ip = $this->_device->getVariable('local_ip','');
+								$port_ip = intval($this->_device->getVariable('local_port',9999));
 								log::add('kkasa','Info',"IP found: $local_ip. Updating");
 								if ($local_ip!='') {
 									$this->setConfiguration("local_ip",$local_ip);
+									$this->setConfiguration("local_port",$local_port);
 									$this->save();
 								}
 							}
@@ -151,11 +133,6 @@ class kkasa extends eqLogic {
 				}
 			}
 			return $this->_device;
-		}
-
-		public function isPowerAvailable() {
-			$device = $this->getDevice();
-			return ($device->is_featured('ENE'));
 		}
 
 		public function featureString() {
@@ -462,7 +439,6 @@ class kkasa extends eqLogic {
 				{
 		      $sysinfo = $device->getSysInfo();
 					$this->refresh();
-					//$changed = $this->setInfo('state',$sysinfo['relay_state']) || $changed;
 					$changed = $this->setInfo('state',$device->getState()) || $changed;
 					$changed = $this->setInfo('rssi',$sysinfo['rssi']) || $changed;
 					if ($device->is_featured('LED'))
@@ -471,7 +447,7 @@ class kkasa extends eqLogic {
 					$this->setConfiguration('fwId', $sysinfo['fwId']);
 					$this->setConfiguration('oemId', $sysinfo['oemId']);
 
-					if ($this->isPowerAvailable())
+					if ($device->is_featured('ENE'))
 					{
 						$data = $device->getRealTime();
 						foreach($data as $key => $value)
