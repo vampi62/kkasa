@@ -169,7 +169,7 @@ class kkasa extends eqLogic {
 		}
 
 		public function is_featured($feature) {
-			if (strpos($this->getConfiguration('features',''))===false)
+			if (strpos($this->getConfiguration('features',''),$feature)===false)
 				return false;
 			else {
 				return true;
@@ -787,11 +787,15 @@ class kkasa extends eqLogic {
 			if ($cmd!='all')
 				$cmdSets = array($cmd);
 			else {
+				foreach($this->getCmd() as $curCmd)
+					$curCmd->remove();
 				$cmdSets = array('basic');
 				foreach(self::FEATURES as $feature => $cmdType)
 				{
 					if ($this->is_featured($feature))
+					{
 						$cmdSets[] = $cmdType;
+					}
 				}
 			}
 			$nb_cmd = 0;
