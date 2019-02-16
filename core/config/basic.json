@@ -20,6 +20,14 @@
   					"isVisible": 1,
   					"isRefreshCmd": 1,
   					"subtype": "other"
+  			},
+  			{
+  					"name": "Hors ligne",
+  					"logicalId": "offline",
+  					"type": "info",
+  					"isVisible": 0,
+            "isHistorized": 0,
+  					"subtype": "binary"
   			}
     ]
 }

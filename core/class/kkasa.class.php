@@ -107,30 +107,42 @@ class kkasa extends eqLogic {
 				if (config::byKey('cloud', 'kkasa')==1) {
 					$this->_device = $client->getDeviceById($this->getLogicalId());
 				} else {
+					$local_ip = $this->getConfiguration('local_ip');
+					$local_port = $this->getConfiguration('local_port',9999);
 					try {
-						$this->_device = $client->getDeviceByIp(
-							$this->getConfiguration('local_ip'),
-							$this->getConfiguration('local_port',9999)
-						);
+						$this->_device = $client->getDeviceByIp($local_ip,$local_port);
 					} catch (KKPA\Exceptions\KKPAClientException $ex) {
 						if ($ex->getCode()==KKPA_NO_ROUTE_TO_HOST) {
 							log::add('kkasa','Info',"Cannot reach $local_ip. Trying to autodetect IP of ".$this->getLogicalId());
-							$this->_device = $client->getDeviceById($this->getLogicalId());
-							if (is_object($this->_device)) {
-								$local_ip = $this->_device->getVariable('local_ip','');
-								$port_ip = intval($this->_device->getVariable('local_port',9999));
-								log::add('kkasa','Info',"IP found: $local_ip. Updating");
-								if ($local_ip!='') {
-									$this->setConfiguration("local_ip",$local_ip);
-									$this->setConfiguration("local_port",$local_port);
-									$this->save();
+							try {
+								$this->_device = $client->getDeviceById($this->getLogicalId());
+								if (is_object($this->_device)) {
+									$local_ip = $this->_device->getVariable('local_ip','');
+									$port_ip = intval($this->_device->getVariable('local_port',9999));
+									log::add('kkasa','Info',"IP found: $local_ip. Updating");
+									if ($local_ip!='') {
+										$this->setConfiguration("local_ip",$local_ip);
+										$this->setConfiguration("local_port",$local_port);
+										$this->save();
+									}
+								}
+							} catch (KKPA\Exceptions\KKPAClientException $ex) {
+								if ($ex->getCode()==KKPA_NOT_FOUND) {
+									$this->setInfo('offline',1);
+									throw $ex;
 								}
 							}
 						} else {
+							$this->setInfo('offline',1);
 							throw $ex;
 						}
 					}
 				}
+			}
+			if (is_null($this->_device))
+				$this->setInfo('offline',1);
+			else {
+				$this->setInfo('offline',0);
 			}
 			return $this->_device;
 		}
@@ -145,6 +157,14 @@ class kkasa extends eqLogic {
 			if ($device->is_featured('TMP')) $result[] = 'TMP';
 			if ($device->is_featured('COL')) $result[] = 'COL';
 			return implode("|",$result);
+		}
+
+		public function is_featured($feature) {
+			if (strpos($this->getConfiguration('features',''))===false)
+				return false;
+			else {
+				return true;
+			}
 		}
 
     public static function cron() {
@@ -519,6 +539,7 @@ class kkasa extends eqLogic {
 
 					$success = true;
 
+					$this->setInfo('offline',0);
 					if ($changed) {
 						$this->refreshWidget();
 					}
@@ -528,7 +549,11 @@ class kkasa extends eqLogic {
 					$attempt++;
 		  		log::add(__CLASS__, 'debug', "ERROR during request - attempt #" . $attempt . "/3");
 		  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-					if ($attempt>2) throw $ex;
+					if ($attempt>2)
+					{
+						$this->setInfo('offline',1);
+						throw $ex;
+					}
 				}
 			}
 
@@ -558,7 +583,11 @@ class kkasa extends eqLogic {
 					$attempt++;
 					log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
 					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-					if ($attempt > 2) throw $ex;
+					if ($attempt>2)
+					{
+						$this->setInfo('offline',1);
+						throw $ex;
+					}
 				}
 			}
 		}
@@ -587,7 +616,11 @@ class kkasa extends eqLogic {
 					$attempt++;
 					log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
 					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-					if ($attempt > 2) throw $ex;
+					if ($attempt>2)
+					{
+						$this->setInfo('offline',1);
+						throw $ex;
+					}
 				}
 			}
 		}
@@ -611,9 +644,6 @@ class kkasa extends eqLogic {
 						$device->switchOn();
 						sleep(0.1);
 						$device->setLightState($color_temp,$hue,$saturation,$brightness);
-						/*
-						sleep(0.1);
-						$device->setBrightness($level);*/
 					} else {
 						$device->switchOff();
 					}
@@ -626,7 +656,11 @@ class kkasa extends eqLogic {
 					$attempt++;
 					log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
 					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-					if ($attempt > 2) throw $ex;
+					if ($attempt>2)
+					{
+						$this->setInfo('offline',1);
+						throw $ex;
+					}
 				}
 			}
 		}
@@ -656,7 +690,11 @@ class kkasa extends eqLogic {
 					$attempt++;
 					log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
 					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-					if ($attempt > 2) throw $ex;
+					if ($attempt>2)
+					{
+						$this->setInfo('offline',1);
+						throw $ex;
+					}
 				}
 			}
 		}
@@ -681,7 +719,11 @@ class kkasa extends eqLogic {
 					$attempt++;
 					log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
 					log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-					if ($attempt > 2) throw $ex;
+					if ($attempt>2)
+					{
+						$this->setInfo('offline',1);
+						throw $ex;
+					}
 				}
 			}
 		}
@@ -720,7 +762,7 @@ class kkasa extends eqLogic {
     /*     * *********************Méthodes d'instance************************* */
 
     public function preInsert() {
-
+			$this->setConfiguration('features',$this->featureString());
     }
 
     public function postInsert() {
@@ -729,19 +771,17 @@ class kkasa extends eqLogic {
     }
 
     public function preSave() {
-			$this->setConfiguration('features',$this->featureString());
-
     }
 
 		public function loadCmdFromConf($cmd='all',$force=0) {
-			$device = $this->getDevice();
+			//$device = $this->getDevice();
 			if ($cmd!='all')
 				$cmdSets = array($cmd);
 			else {
 				$cmdSets = array('basic');
 				foreach(self::FEATURES as $feature => $cmdType)
 				{
-					if ($device->is_featured($feature))
+					if ($this->is_featured($feature))
 						$cmdSets[] = $cmdType;
 				}
 			}
@@ -785,11 +825,6 @@ class kkasa extends eqLogic {
 				$nb_cmd += count($device['commands']);
 			}
 			return $nb_cmd;
-		}
-
-		public function getConfFilePath()
-		{
-			return strtolower(substr($this->getConfiguration('model'),0,5));
 		}
 
     public function postSave() {
