@@ -105,7 +105,16 @@ class kkasa extends eqLogic {
 			if ($this->_device == null) {
 				$client = self::getClient();
 				if (config::byKey('cloud', 'kkasa')==1) {
-					$this->_device = $client->getDeviceById($this->getLogicalId());
+					try {
+						$this->_device = $client->getDeviceById($this->getLogicalId());
+					}
+					catch(KKPA\Exceptions\KKPADeviceException $ex)
+					{
+						if ($ex->getCode() == KKPA_DEVICE_OFFLINE || $ex->getCode() == KKPA_TIMEOUT) {
+							$this->setInfo('offline',1);
+							throw $ex;
+						}
+					}
 				} else {
 					$local_ip = $this->getConfiguration('local_ip');
 					$local_port = $this->getConfiguration('local_port',9999);
