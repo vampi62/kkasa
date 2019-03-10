@@ -112,8 +112,12 @@ class kkasa extends eqLogic {
 					{
 						if ($ex->getCode() == KKPA_DEVICE_OFFLINE || $ex->getCode() == KKPA_TIMEOUT) {
 							$this->setInfo('offline',1);
-							throw $ex;
 						}
+						throw $ex;
+					}
+					catch(Exception $ex)
+					{
+						throw $ex;
 					}
 				} else {
 					$local_ip = $this->getConfiguration('local_ip');
@@ -145,6 +149,10 @@ class kkasa extends eqLogic {
 							$this->setInfo('offline',1);
 							throw $ex;
 						}
+					}
+					catch (Exception $ex)
+					{
+						throw $ex;
 					}
 				}
 			}
@@ -461,6 +469,11 @@ class kkasa extends eqLogic {
 			$success = false;
 			$changed = false;
 			$device = $this->getDevice();
+			if (is_null($device))
+			{
+				log::add(__CLASS__, 'debug', "ERROR device is null on line ".__LINE__);
+				throw new Exception("Device is null");
+			}
 			log::add('kkasa','debug','Processing refresh of '.$device->getVariable('deviceId',''));
 			while((!$success) && $attempt < 3)
 			{
