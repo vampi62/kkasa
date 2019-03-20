@@ -390,6 +390,7 @@ class kkasa extends eqLogic {
     public static function syncWithKasa() {
   		$client = self::getClient();
   		$devicelist = $client->getDeviceList();
+			log::add(__CLASS__, 'debug',"SCAN: ".count($devicelist)." devices found");
 			$nb_devices = 0;
   		foreach ($devicelist as $device) {
 				log::add(__CLASS__, 'debug',$device->toString());
@@ -445,7 +446,9 @@ class kkasa extends eqLogic {
 	  				$eqLogic->setIsEnable(1);
 	  				$eqLogic->save();
 						$nb_devices++;
-	  			}
+	  			} else {
+						log::add(__CLASS__, 'debug',"$deviceId found but already known");
+					}
 					$eqLogic->refreshWidget();
 				} catch(KKPA\Exceptions\KKPADeviceException $ex)
 				{
