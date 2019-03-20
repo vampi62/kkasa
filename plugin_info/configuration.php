@@ -50,5 +50,16 @@ if (!isConnect()) {
     						</select>
             </div>
         </div>
+      	<div class="form-group">
+            <label class="col-sm-4 control-label">{{Niveau de log de l'erreur "Equipement hors ligne"}}</label>
+            <div class="col-lg-2">
+    						<select class="form-control configKey" data-l1key="offline_log">
+    							<option value="error">{{Erreur}}</option>
+    							<option value="warning">{{Avertissement}}</option>
+    							<option value="info">{{Info}}</option>
+    							<option value="debug">{{Debug}}</option>
+    						</select>
+            </div>
+        </div>
   </fieldset>
 </form>

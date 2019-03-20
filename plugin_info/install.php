@@ -29,6 +29,10 @@ function kkasa_update() {
   {
     config::save('cron_freq', '15','kkasa');
   }
+  if (config::byKey('offline_log', 'kkasa','-1')=='-1')
+  {
+    config::save('offline_log', 'error','kkasa');
+  }
   $kkasa_version = config::byKey('version','kkasa','1.0');
   log::add('kkasa', 'debug', "Update kkasa from ".$kkasa_version . " to ".KKASA_VERSION);
 

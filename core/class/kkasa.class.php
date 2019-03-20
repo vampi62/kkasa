@@ -142,9 +142,23 @@ class kkasa extends eqLogic {
 
 	 public static function cronExec() {
 		 foreach (self::byType('kkasa') as $kkasa) {
-			 if ($kkasa->getIsEnable())
+			 try {
+				 if ($kkasa->getIsEnable())
+				 {
+					 $kkasa->syncRealTime();
+				 }
+			 } catch(KKPA\Exceptions\KKPADeviceException $ex)
 			 {
-				 $kkasa->syncRealTime();
+				 if ($ex->getCode() == KKPA_DEVICE_OFFLINE || $ex->getCode() == KKPA_TIMEOUT)
+				{
+					$log_level = config::byKey('offline_log', __CLASS__,'error');
+					if ($log_level!='error')
+						log::add(__CLASS__,$log_level,"Device is offline");
+					else
+						throw $ex;
+				} else {
+					throw $ex;
+				}
 			 }
 		 }
 	 }
