@@ -1,0 +1,26 @@
+{
+    "commands": [
+      {
+          "name": "Couleur",
+          "logicalId": "color",
+          "type": "action",
+          "isVisible": 1,
+          "value": "colorState",
+          "subtype": "color",
+          "display": {
+              "generic_type": "LIGHT_SET_COLOR"
+          }
+      },
+      {
+            "name": "Etat couleur",
+            "logicalId": "colorState",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "subtype": "string",
+            "display": {
+                "generic_type": "LIGHT_COLOR"
+            }
+        }
+    ]
+}

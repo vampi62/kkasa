@@ -1,0 +1,49 @@
+{
+    "commands": [
+        {
+            "name": "On",
+            "logicalId": "on",
+            "type": "action",
+            "isVisible": 1,
+            "value": "state",
+            "subtype": "other",
+            "display": {
+                "generic_type": "ENERGY_ON"
+            },
+            "template": {
+                "dashboard": "prise",
+                "mobile": "prise"
+            }
+        },
+        {
+            "name": "Off",
+            "logicalId": "off",
+            "type": "action",
+            "isVisible": 1,
+            "value": "state",
+            "subtype": "other",
+            "display": {
+                "generic_type": "ENERGY_OFF"
+            },
+            "template": {
+                "dashboard": "prise",
+                "mobile": "prise"
+            }
+        },
+        {
+            "name": "Etat",
+            "logicalId": "state",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 1,
+            "subtype": "binary",
+            "template": {
+                "dashboard": "prise",
+                "mobile": "prise"
+            },
+            "display": {
+                "generic_type": "ENERGY_STATE"
+            }
+        }
+    ]
+}

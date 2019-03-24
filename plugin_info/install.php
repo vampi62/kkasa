@@ -21,6 +21,7 @@ require_once dirname(__FILE__) . '/../core/php/kkasa.inc.php';
 
 function kkasa_install() {
   config::save('cron_freq', '15','kkasa');
+  config::save('cloud', '1','kkasa');
   config::save('version',KKASA_VERSION,'kkasa');
 }
 
@@ -33,6 +34,10 @@ function kkasa_update() {
   {
     config::save('offline_log', 'error','kkasa');
   }
+  if (config::byKey('cloud', 'kkasa','-1')=='-1')
+  {
+    config::save('cloud', '1','kkasa');
+  }
   $kkasa_version = config::byKey('version','kkasa','1.0');
   log::add('kkasa', 'debug', "Update kkasa from ".$kkasa_version . " to ".KKASA_VERSION);
 
@@ -40,6 +45,13 @@ function kkasa_update() {
   {
     foreach (eqLogic::byType('kkasa') as $eqLogic) {
       addCmd($eqLogic,'rssi','info','numeric',__('Force signal',__FILE__),0,1,'dBm');
+    }
+  }
+
+  if (version_compare($kkasa_version,'1.91','<'))
+  {
+    foreach (eqLogic::byType('kkasa') as $eqLogic) {
+      $eqLogic->addLedCmd();
     }
   }
 

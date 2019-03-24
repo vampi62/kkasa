@@ -22,15 +22,38 @@ if (!isConnect()) {
     die();
 }
 ?>
+<script>
+$(".configKey[data-l1key='cloud']")
+  .change(function() {
+    cloud = $( ".configKey[data-l1key='cloud'] option:selected" ).val();
+    if (cloud == 1)
+    {
+      $(".kkasa-only-cloud").show();
+    } else {
+      $(".kkasa-only-cloud").val("");
+      $(".kkasa-only-cloud").hide();
+    }
+  })
+  .change();
+</script>
 <form class="form-horizontal">
     <fieldset>
         <div class="form-group">
+            <label class="col-sm-4 control-label">{{Mode}}</label>
+            <div class="col-lg-2">
+                <select class="form-control configKey" data-l1key="cloud">
+                  <option value="0">{{Local}}</option>
+                  <option value="1">{{Cloud}}</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group kkasa-only-cloud">
             <label class="col-lg-4 control-label">{{Nom d'utilisateur Kasa}}</label>
             <div class="col-lg-2">
                 <input class="configKey form-control" data-l1key="username" />
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group kkasa-only-cloud">
             <label class="col-lg-4 control-label">{{Mot de passe Kasa}}</label>
             <div class="col-lg-2">
                 <input type="password" class="configKey form-control" data-l1key="password" />
