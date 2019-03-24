@@ -30,6 +30,10 @@ function kkasa_update() {
   {
     config::save('cron_freq', '15','kkasa');
   }
+  if (config::byKey('offline_log', 'kkasa','-1')=='-1')
+  {
+    config::save('offline_log', 'error','kkasa');
+  }
   if (config::byKey('cloud', 'kkasa','-1')=='-1')
   {
     config::save('cloud', '1','kkasa');
