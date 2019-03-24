@@ -1,0 +1,30 @@
+{
+    "commands": [
+        {
+            "name": "LED activée",
+            "logicalId": "ledState",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "subtype": "binary",
+            "display": {
+                "generic_type": "LIGHT_STATE"
+            }
+        },
+        {
+            "name": "Commuter LED",
+            "logicalId": "toogleLed",
+            "type": "action",
+            "isVisible": 0,
+            "value": "ledState",
+            "subtype": "other",
+            "display": {
+                "generic_type": "LIGHT_TOGGLE"
+            },
+            "template": {
+                "dashboard": "light",
+                "mobile": "light"
+            }
+        }
+    ]
+}
