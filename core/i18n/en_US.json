@@ -30,7 +30,21 @@
         "Nom": "Name",
         "Options": "Options",
         "Action": "Action",
-        "Debug Infos": "Debug Info"
+        "Debug Infos": "Debug Info",
+        "Ajouter mes équipements": "Ajouter mes équipements",
+        "Local IP": "Local IP",
+        "Local port": "Local port",
+        "Features": "Features",
+        "Recharger les commandes": "Recharger les commandes",
+        "Charger toutes les commandes": "Charger toutes les commandes",
+        "Recharger commandes Basiques": "Recharger commandes Basiques",
+        "Recharger commandes Prise": "Recharger commandes Prise",
+        "Recharger commandes Energie": "Recharger commandes Energie",
+        "Recharger commandes LED": "Recharger commandes LED",
+        "Recharger commandes lumière": "Recharger commandes lumière",
+        "Recharger commandes température": "Recharger commandes température",
+        "Recharger commandes couleur": "Recharger commandes couleur",
+        "Paramètres": "Paramètres"
     },
     "plugins\/kkasa\/desktop\/js\/kkasa.js": {
         "Nom": "Name",
@@ -38,7 +52,25 @@
         "Historiser": "Historize",
         "Tester": "Test",
         "Synchronisation réussie": "Successful synchronization",
-        "Merci de raffraichir la page": "Please refresh the page"
+        "Merci de raffraichir la page": "Please refresh the page",
+        "Icône": "Icône",
+        "La valeur de la commande vaut par défaut la commande": "La valeur de la commande vaut par défaut la commande",
+        "Afficher": "Afficher",
+        "Inverser": "Inverser",
+        "Unité": "Unité",
+        "Min": "Min",
+        "Max": "Max",
+        "Opération réalisée avec succès": "Opération réalisée avec succès",
+        "équipement(s) trouvé(s)": "équipement(s) trouvé(s)",
+        "Informations debug inscrites dans les log": "Informations debug inscrites dans les log",
+        "Recharge configuration": "Recharge configuration",
+        "Recharger la configuration": "Recharger la configuration",
+        "Sélectionner le mode de rechargement de la configuration": "Sélectionner le mode de rechargement de la configuration",
+        "Sans recréer les commandes mais en créeant les manquantes": "Sans recréer les commandes mais en créeant les manquantes",
+        "En recréant les commandes": "En recréant les commandes",
+        "Attention, \"en recréant les commandes\" va supprimer les commandes existantes.": "Attention, \"en recréant les commandes\" va supprimer les commandes existantes.",
+        "Annuler": "Annuler",
+        "Etes-vous sûr de vouloir récréer les commandes ? Cela va supprimer les commandes existantes": "Etes-vous sûr de vouloir récréer les commandes ? Cela va supprimer les commandes existantes"
     },
     "plugins\/kkasa\/plugin_info\/configuration.php": {
         "Nom d'utilisateur Kasa": "Kasa Username",
@@ -47,7 +79,15 @@
         "Aucun": "Aucun",
         "min": "min",
         "Heure": "Heure",
-        "jour": "jour"
+        "jour": "jour",
+        "Mode": "Mode",
+        "Local": "Local",
+        "Cloud": "Cloud",
+        "Niveau de log de l'erreur \"Equipement hors ligne\"": "Niveau de log de l'erreur \"Equipement hors ligne\"",
+        "Erreur": "Erreur",
+        "Avertissement": "Avertissement",
+        "Info": "Info",
+        "Debug": "Debug"
     },
     "plugins\/kkasa\/core\/class\/kkasa.class.php": {
         "Power": "Power",
@@ -71,9 +111,14 @@
         "Mettre à jour le plugin": "Mettre à jour le plugin",
         "Version KKPA": "Version KKPA",
         "Vérifier vos identifiants Kasa dans la configuration du plugin": "Vérifier vos identifiants Kasa dans la configuration du plugin",
-        "Vérifiez que vos prises sont connectées au wifi": "Vérifiez que vos prises sont connectées au wifi"
+        "Vérifiez que vos prises sont connectées au wifi": "Vérifiez que vos prises sont connectées au wifi",
+        "Hors ligne": "Hors ligne",
+        "Régler intensité": "Régler intensité",
+        "Température de blanc": "Température de blanc",
+        "Régler temp blanc": "Régler temp blanc"
     },
     "plugins\/kkasa\/core\/ajax\/kkasa.ajax.php": {
-        "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa": "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa"
+        "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa": "Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa",
+        "Synchronisation terminée mais aucun nouvel équipement joignable trouvé. Vérifiez l'application mobile Kasa": "Synchronisation terminée mais aucun nouvel équipement joignable trouvé. Vérifiez l'application mobile Kasa"
     }
 }
