@@ -7,53 +7,52 @@ Today, only the connected plugs HS100 and HS110 (v1 & v2) are processed.
 Warnings
 ===
 
--   A ce jour, seules les prises HS100 et HS110 (v1 & v2) sont prises en charge.
--   Si vous rencontrez un problème, n'hésitez pas à participer au sujet dédié sur le forum ou sur les "issues" Github.
-    Merci de regarder la section [Debug](#Debug) ci-dessous pour m'envoyer les bonnes informations.
+-   Up to now, only the HS100 and HS110 (v1 & v2) devices are supported.
+-   If you encounter an issue, feel free to participate in the dedicated topic on the forum or on "issues" Github.
+    Please see the [Debug] (# Debug) section below to send me the required details.
 
-Prérequis
+Prerequisites
 ===
-Pour le moment, le plugin nécessite que vous ayez correctement installé votre
-équipement et configuré sa connexion avec Kasa (avec l'application mobile Kasa).
+Up to now, the plugin requires that you have correctly installed your
+equipment and configured its connection with Kasa (with the Kasa mobile application).
 
 
-Installation
+Setup
 ===
-Suite à l'installation et activation du plugin, rendez-vous sur la page de configuration pour installer les dépendances.
+After installing and activating the plugin, go to the configuration page to install the dependencies.
 
-Puis renseigner vos identifiants Kasa et sélectionnez la fréquence de rafraîchissement désirée.
+Then enter your Kasa credentials and select the desired refresh rate.
 
-**Attention :** je n'ai aucune information sur une éventuelle limite du nombre de requêtes de l'API Kasa, mais si elle existe il se pourrait que TP-Link bloque vos requêtes jugées trop fréquentes et considérées comme abusives.
-Pour le moment, je me suis limité à une fréquence de rafraîchissement de 15min dans mes tests sans soucis.
+**Warning:** I have no information about a possible limitation on the number of Kasa API requests, but if it exists TP-Link may be blocking your requests deemed too frequent and considered abusive.
+For the moment, I have limited myself to a refresh rate of 15min in my tests without worries.
 
-Vous restez donc responsable de votre utilisation, du choix de ce paramètre et des conséquences éventuelles que cela impliquerait.
+Therefore you remain responsible for your use, the choice of this parameter and the possible consequences that this would imply.
 
-Sauvegardez, puis rendez-vous sur la page du plugin (dans la catégorie "objets
-connectés").
+Save, then go to the plugin page (in the "IoT" category).
 
-Appuyez sur "Synchroniser avec Kasa" et vous devriez voir apparaître vos équipements.
+Press "Synchronize with Kasa" and you should see your devices appear.
 
-Et voila !
+Et voila!
 
 Debug
 ===
-Si vous rencontrez des soucis, vous pouvez me le remonter sur les issues github ou forum jeedom.
-Merci au préalable de :
-* activer le niveau de log "debug" sur le plugin.
-* Reproduisez votre erreur.
-* Un nouveau bouton "Debug Infos" est apparu sur la page du plugin. Appuyer dessus.
-* Puis envoyer le résultat du log kkasa.
-**Obligatoire :** merci de m'indiquer les versions KKASA et KKPA utilisées (voir la page "santé" sur votre jeedom) ainsi que votre mode d'installation (depuis le market stable ou bêta ? depuis github branche master ou develop ?)
+If you encounter any problems, you can put it back on github issues or forum jeedom.
+Thank you in advance for:
+* enable log level "debug" on the plugin.
+* Reproduce your issue.
+* A new "Debug Info" button appeared on the plugin page. Press it.
+* Then send the result of the kkasa log.
+**Required:** Please indicate to me the KKASA and KKPA versions used (see the "health" page on your jeedom) as well as your installation method (from the stable market or beta? From github branch master or develop? )
 
-Encore un avertissement !
+Another warning!
 ===
-* Les possesseurs de HS110 ont peut-être remarqué que la puissance n'était pas toujours égale au produit du voltage et de l'intensité. La raison se trouve dans la différence entre puissance active et apparente.
+* Owners of HS110 may have noticed that the power was not always equal to the product of the voltage and the intensity. The reason lies in the difference between active and apparent power.
 
-Plus d'information sur la [page wikipedia](https://fr.wikipedia.org/wiki/Puissance_en_r%C3%A9gime_alternatif) ou ce [petit dessin animé très bien fichu](https://www.youtube.com/watch?v=IURKavCBUkE).
+More information on the [page wikipedia] (https://en.wikipedia.org/wiki/Power_in_r%C3%A9gime_alternatif) or this [little cartoon very well done] (https://www.youtube.com/watch? v = IURKavCBUkE).
 
-* La mise à jour des valeurs (état, puissance, consommation) se fait sur demande
-avec la commande "rafraîchir", à la sauvegarde de votre équipement, à l'appel
-d'une action (switch On/Off) et via le cron en fonction de la fréquence que vous avez paramétré.
-Cela signifie donc qu'une modification de l'état directement sur l'équipement
-ou via l'application Kasa ne sera prise en compte qu'après votre délais de rafraîchissement (ou par action
-manuellement de votre part sur Jeedom).
+* The update of the values (state, power, consumption) is done on request
+with the "refresh" command, when saving your equipment, on the call
+an action (switch On / Off) and via the cron according to the frequency you have set.
+This means that a change of state directly on the device
+or via the Kasa mobile app will only be taken into account after your refresh period (or 
+manually from you on Jeedom).

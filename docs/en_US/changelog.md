@@ -1,46 +1,46 @@
-Version 1.1 "Chandeleur" - 04/02/2019
+Version 1.1 "Candlemas" - 04/02/2019
 ===
 **Enhancements:**
 * Several attempts before the request fails
 * Management of auto refresh frequencies
 * Automatic page refresh after Kasa synchro
-* Ajout force du signal
-* Compatibilité avec KKPA v2
+* Adding signal strength
+* Compatibility with KKPA v2
 
-**Corrections :**
-* HS100 : désactivation des requêtes de consommation (réduction des erreurs)
-* Ignore les prises offline lors de la synchro Kasa
-* Corrections de la page santé
+**Fixes:**
+* HS100: deactivation of consumption requests (reduction of errors)
+* Ignore offline devices during Kasa sync
+* Corrections of the health page
 
 Version 1.0 "Galette des rois" - 08/01/2019
 ===
-**Evolutions :**
-* Passage en stable sur le market Jeedom
-* Améliorations du debug
+**Enhancements:**
+* Steady transition to the Jeedom market
+* Debug improvements
 
-**Corrections :**
-* Correction de la page "santé"
+**Fixes:**
+* Correction of the "health" page
 
 Version 0.9 "Release candidate" - 11/12/2018
 ===
-**Evolutions :**
-* Amélioration des messages debug
-* Vérification de la version des dépendances
+**Enhancements:**
+* Improved debug messages
+* Verifying the version of the dependencies
 
-**Corrections :**
-* Gestion des équipements multiples
-* Délais de raffraichissement du widget
+**Fixes:**
+* Management of multiple devices
+* Refresh frequency of the widget
 
-Version 0.8 "Fête des lumières" - 09/12/2018
+Version 0.8 "Festival of Lights" - 09/12/2018
 ===
-**Evolutions :**
-* Mode debug : activez le niveau de log "debug" sur le plugin pour obtenir un nouveau bouton qui inscrira les informations nécessaires sur le log kkasa
+**Enhancements:**
+* Debug mode: activate the log level "debug" on the plugin to get a new button that will populate the required details on the kkasa log
 
-**Corrections :**
-* Anonymisation des informations username / password / latitude / longitude dans les logs
-* Correction bug lorsque plusieurs prises sont configurées
-* Corrections HS110 v1 (remontée de la puissance / conso)
-* Prise en charge des exceptions
+**Fixes:**
+* Anonymization of username / password / latitude / longitude details in logs
+* Fixed bug when multiple devices are configured
+* Corrections HS110 v1 (power / consumption data output)
+* Support for exceptions
 
-Version initiale - 18/11/2018
+Initial version - 18/11/2018
 ===
