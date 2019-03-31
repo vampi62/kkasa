@@ -1,4 +1,5 @@
 FILENAME="$2/dependancy_kkasa_in_progress"
+REQ_VERSION="2.0"
 echo "Destination is $1"
 echo "Tmp folder is $2"
 touch ${FILENAME}
@@ -9,19 +10,19 @@ cd $2
 echo 5  > ${FILENAME}
 rm -f v2.zip
 echo 10  > ${FILENAME}
-wget https://github.com/kavod/KKPA/archive/v2.zip
+wget https://github.com/kavod/KKPA/archive/V${REQ_VERSION}.zip
 echo 15 > ${FILENAME}
-unzip -o v2.zip
+unzip -o "V${REQ_VERSION}.zip"
 echo 20 > ${FILENAME}
-rm -f v2.zip
+rm -f "V${REQ_VERSION}.zip"
 echo 25 > ${FILENAME}
 rm -Rf "$1/KKPA"
 echo 30 > ${FILENAME}
 mkdir "$1/KKPA"
 echo 35 > ${FILENAME}
-mv -f KKPA-2/src/* "$1/KKPA"
+mv -f KKPA-${REQ_VERSION}/src/* "$1/KKPA"
 echo 40 > ${FILENAME}
-rm -Rf KKPA-2
+rm -Rf KKPA-${REQ_VERSION}
 echo 45 > ${FILENAME}
 
 echo "* phpColors"
