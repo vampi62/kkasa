@@ -1,58 +1,67 @@
 Description
 ===
 
-Plugin for controlling TP-Link connected objects via the manufacturer's platform: [Kasa](https://www.tp-link.com/us/kasa-smart/kasa.html).
-Today, only the connected plugs HS100 and HS110 (v1 & v2) are processed.
+Plugin permettant de piloter des objets connectés TP-Link.
+Deux modes de fonctionnement :
 
-Warnings
+- **Mode cloud (par défaut) :** communication via la plateforme [Kasa](https://www.tp-link.com/us/kasa-smart/kasa.html) (nécessaire si votre Jeedom n'est pas dans le même réseau local que vos équipements)
+- **Mode local :** communication directe via le réseau local
+
+Equipements compatibles :
 ===
 
--   Up to now, only the HS100 and HS110 (v1 & v2) devices are supported.
--   If you encounter an issue, feel free to participate in the dedicated topic on the forum or on "issues" Github.
-    Please see the [Debug] (# Debug) section below to send me the required details.
+- **Prises connectées** HS100, HS105, HS110, HS200, HS220, HS300
+- **Ampoules connectées** LB100, LB120, LB130
 
-Prerequisites
+Installation
 ===
-Up to now, the plugin requires that you have correctly installed your
-equipment and configured its connection with Kasa (with the Kasa mobile application).
+Suite à l'installation et activation du plugin, rendez-vous sur la page de configuration pour installer les dépendances.
 
+Mode Cloud
+==
+En mode cloud, le plugin nécessite que vous ayez correctement installé votre
+équipement et configuré sa connexion avec Kasa (avec l'application mobile Kasa).
 
-Setup
+Puis renseignez vos identifiants Kasa et sélectionnez la fréquence de rafraîchissement désirée.
+
+**Attention :** *je n'ai aucune information sur une éventuelle limite du nombre de requêtes de l'API Kasa, mais si elle existe il se pourrait que TP-Link bloque vos requêtes jugées trop fréquentes et considérées comme abusives.
+Pour le moment, je me suis limité à une fréquence de rafraîchissement de 15min dans mes tests sans soucis.
+Vous restez donc responsable de votre utilisation, du choix de ce paramètre et des conséquences éventuelles que cela impliquerait.*
+
+N'oubliez pas de sauvegarder.
+
+Mode Local
+==
+Il vous suffit de renseigner "Local" dans le champ "Mode" de la page de configuration.
+
+Là aussi : n'oubliez pas de sauvegarder.
+
+Mise à jour
 ===
-After installing and activating the plugin, go to the configuration page to install the dependencies.
+Après une mise à jour, il est recommandé de réinstaller les dépendances.
 
-Then enter your Kasa credentials and select the desired refresh rate.
+Ajout des équipements
+===
+Rendez-vous sur la page du plugin (dans la catégorie "objets connectés").
+Appuyez sur "Ajouter mes équipements" et vous devriez voir apparaître vos équipements.
 
-**Warning:** I have no information about a possible limitation on the number of Kasa API requests, but if it exists TP-Link may be blocking your requests deemed too frequent and considered abusive.
-For the moment, I have limited myself to a refresh rate of 15min in my tests without worries.
-
-Therefore you remain responsible for your use, the choice of this parameter and the possible consequences that this would imply.
-
-Save, then go to the plugin page (in the "IoT" category).
-
-Press "Synchronize with Kasa" and you should see your devices appear.
-
-Et voila!
+Et voila !
 
 Debug
 ===
-If you encounter any problems, you can put it back on github issues or forum jeedom.
-Thank you in advance for:
-* enable log level "debug" on the plugin.
-* Reproduce your issue.
-* A new "Debug Info" button appeared on the plugin page. Press it.
-* Then send the result of the kkasa log.
-**Required:** Please indicate to me the KKASA and KKPA versions used (see the "health" page on your jeedom) as well as your installation method (from the stable market or beta? From github branch master or develop? )
+Si vous rencontrez des soucis, vous pouvez me le remonter sur les issues github ou forum jeedom.
+Merci au préalable de :
+* Activez le niveau de log "debug" sur le plugin.
+* Reproduisez votre erreur.
+* Un nouveau bouton "Debug Infos" est apparu sur la page du plugin. Appuyez dessus.
+* Puis envoyez le résultat du log kkasa.
+**Obligatoire :** merci de m'indiquer les versions KKASA et KKPA utilisées (voir la page "santé" sur votre Jeedom) ainsi que votre mode d'installation (depuis le market stable ou bêta ? depuis github branche master ou develop ?)
 
-Another warning!
+Encore un avertissement !
 ===
-* Owners of HS110 may have noticed that the power was not always equal to the product of the voltage and the intensity. The reason lies in the difference between active and apparent power.
-
-More information on the [page wikipedia] (https://en.wikipedia.org/wiki/Power_in_r%C3%A9gime_alternatif) or this [little cartoon very well done] (https://www.youtube.com/watch? v = IURKavCBUkE).
-
-* The update of the values (state, power, consumption) is done on request
-with the "refresh" command, when saving your equipment, on the call
-an action (switch On / Off) and via the cron according to the frequency you have set.
-This means that a change of state directly on the device
-or via the Kasa mobile app will only be taken into account after your refresh period (or 
-manually from you on Jeedom).
+* La mise à jour des valeurs (état, puissance, consommation) se fait sur demande
+avec la commande "rafraîchir", à la sauvegarde de votre équipement, à l'appel
+d'une action (switch On/Off) et via le cron en fonction de la fréquence que vous avez paramétré.
+Cela signifie donc qu'une modification de l'état directement sur l'équipement
+ou via l'application Kasa ne sera prise en compte qu'après votre délais de rafraîchissement (ou par action
+manuellement de votre part sur Jeedom).
