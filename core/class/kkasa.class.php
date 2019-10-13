@@ -932,7 +932,7 @@ class kkasa extends eqLogic {
 			return $default;
 		}
 
-		public function import($_configuration) {
+		public function import($_configuration, $_dontRemove = false) {
 			$cmdClass = $this->getEqType_name() . 'Cmd';
 			if (isset($_configuration['configuration'])) {
 				foreach ($_configuration['configuration'] as $key => $value) {
