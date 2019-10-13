@@ -32,8 +32,11 @@ try {
       {
         ajax::success($nb_devices);
       }
-      else {
+      elseif ($nb_devices == 0) {
         ajax::error(__("Synchronisation terminée mais aucun nouvel équipement joignable trouvé. Vérifiez l'application mobile Kasa",__FILE__));
+      }
+      else {
+        ajax::error(__("Erreur durant la recherche. Essayez de réinstaller les dépendances",__FILE__));
       }
   	} elseif(init('action') == 'debugInfo') {
       kkasa::getDebugInfo();

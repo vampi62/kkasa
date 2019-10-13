@@ -292,6 +292,13 @@ class kkasa extends eqLogic {
   	}
 
 		public static function health() {
+			if (self::dependancy_info()['state'] == 'nok')
+				return array(array(
+				'test' => __('Dépendances', __FILE__),
+				'result' => 'KO',
+				'advice' => __('Réinstallez les dépendances du plugin KKasa',__FILE__),
+				'state' => false,
+			));
 			$return = array();
 			$return[] = self::health_kkasa_version();
 			$return[] = self::health_kkpa_version();
@@ -402,6 +409,13 @@ class kkasa extends eqLogic {
 		}
 
     public static function syncWithKasa() {
+			if (self::dependancy_info()['state'] == 'nok')
+			{
+				log::add(__CLASS__,'error',
+					__('Réinstallez les dépendances du plugin KKasa',__FILE__)
+				);
+				return -1;
+			}
   		$client = self::getClient();
   		$devicelist = $client->getDeviceList();
 			log::add(__CLASS__, 'debug',"SCAN: ".count($devicelist)." devices found");
