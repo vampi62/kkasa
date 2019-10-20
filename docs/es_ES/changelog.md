@@ -1,13 +1,26 @@
-Version 1.1 "St Valentin" - 14/02/2019 (date planifiée)
+Version 2.0 "Poisson d'avril" - 01/04/2019
+===
+**Evolutions :**
+* Gestion des ampoules connectées TP-Link (LB100, LB120, LB130)
+* Gestion du mode local (Connexion au cloud non-obligatoire)
+* Gestion des LED
+* Rafraîchissement des commandes
+* Auto-détection des adresses IP
+* Configuration du niveau de log pour les équipements offline
+
+Version 1.1 "Chandeleur" - 04/02/2019
 ===
 **Evolutions :**
 * Plusieurs tentatives avant échec de la requête
 * Gestion des fréquences de rafraîchissement auto
 * Rafraîchissement de page automatique après synchro Kasa
+* Ajout force du signal
+* Compatibilité avec KKPA v2
 
 **Corrections :**
 * HS100 : désactivation des requêtes de consommation (réduction des erreurs)
 * Ignore les prises offline lors de la synchro Kasa
+* Corrections de la page santé
 
 Version 1.0 "Galette des rois" - 08/01/2019
 ===
