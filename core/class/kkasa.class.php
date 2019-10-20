@@ -440,7 +440,7 @@ class kkasa extends eqLogic {
 	  			$eqLogic = kkasa::byLogicalId($deviceId, 'kkasa');
 	  			if (!is_object($eqLogic)) {
 	  				$eqLogic = new self();
-	                  foreach (object::all() as $object) {
+	                  foreach (jeeObject::all() as $object) {
 	                      if (stristr($alias,$object->getName())){
 	                          $eqLogic->setObject_id($object->getId());
 	                          break;
