@@ -32,12 +32,23 @@ try {
       {
         ajax::success($nb_devices);
       }
+      elseif ($nb_devices == 0) {
+        ajax::error(__("Synchronisation terminée mais aucun nouvel équipement joignable trouvé. Vérifiez l'application mobile Kasa",__FILE__));
+      }
       else {
-        ajax::error(__("Synchronisation terminée mais aucun équipement joignable trouvé. Vérifiez l'application mobile Kasa",__FILE__));
+        ajax::error(__("Erreur durant la recherche. Essayez de réinstaller les dépendances",__FILE__));
       }
   	} elseif(init('action') == 'debugInfo') {
       kkasa::getDebugInfo();
       ajax::success();
+    } elseif(init('action') == 'createCmd') {
+      $id = init('id');
+      $device = eqLogic::byId($id);
+      $nb_cmd = $device->loadCmdFromConf(init('cmdType'),init('createcommand'));
+      if ($nb_cmd < 0)
+        ajax::error(__("Erreur durant l'ajout des commandes",__FILE__));
+      else
+        ajax::success("Cool");
     }
 
 

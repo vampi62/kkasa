@@ -1,43 +1,56 @@
-Version 1.1 "Valentine's Day" - 02/14/2019 (planned date)
+Version 2.0 "Poisson d'avril" - 01/04/2019
 ===
 **Enhancements:**
-* Several attempts before the request fails
-* Management of auto refresh frequencies
-* Automatic page refresh after Kasa synchro
+* Gestion des ampoules connectées TP-Link (LB100, LB120, LB130)
+* Gestion du mode local (Connexion au cloud non-obligatoire)
+* Gestion des LED
+* Rafraîchissement des commandes
+* Auto-détection des adresses IP
+* Configuration du niveau de log pour les équipements offline
 
-**Fixes:**
-* HS100: deactivation of consumption requests (reduction of errors)
-* Ignore offline plugs during Kasa sync
-
-Version 1.0 "Galette des rois" - 01/08/2019
+Version 1.1 "Chandeleur" - 04/02/2019
 ===
-**Enhancements:**
-* Considered stable on the Jeedom market
-* Debug improvements
+**Evolutions :**
+* Plusieurs tentatives avant échec de la requête
+* Gestion des fréquences de rafraîchissement auto
+* Rafraîchissement de page automatique après synchro Kasa
+* Ajout force du signal
+* Compatibilité avec KKPA v2
 
 **Fixes:**
-* Correction of the "health" page
+* HS100 : désactivation des requêtes de consommation (réduction des erreurs)
+* Ignore les prises offline lors de la synchro Kasa
+* Corrections de la page santé
 
-Version 0.9 "Release candidate" - 12/11/2018
+Version 1.0 "Galette des rois" - 08/01/2019
 ===
-**Enhancements:**
-* Improvement of debug messages
-* Version dependencies check
+**Evolutions :**
+* Passage en stable sur le market Jeedom
+* Améliorations du debug
 
-**Fixes:**
-* Management of multiple equipments
-* Refresh time of the widget
+**Corrections :**
+* Correction de la page "santé"
 
-Version 0.8 "Festival of Lights" - 12/09/2018
+Version 0.9 "Release candidate" - 11/12/2018
 ===
-**Enhancements:**
-* Debug mode: activate the log level "debug" on the plugin to get a new button that will register the necessary information on the log kkasa
+**Evolutions :**
+* Amélioration des messages debug
+* Vérification de la version des dépendances
 
-**Fixes:**
-* Anonymization of username / password / latitude / longitude information in logs
-* Fixed bug when multiple plugs are configured
-* Fix HS110 v1 (power / consumnption reading)
-* Support for exceptions
+**Corrections :**
+* Gestion des équipements multiples
+* Délais de raffraichissement du widget
 
-Initial version - 11/18/2018
+Version 0.8 "Fête des lumières" - 09/12/2018
+===
+**Evolutions :**
+* Mode debug : activez le niveau de log "debug" sur le plugin pour obtenir un nouveau bouton qui inscrira les informations nécessaires sur le log kkasa
+
+**Corrections :**
+* Anonymisation des informations username / password / latitude / longitude dans les logs
+* Correction bug lorsque plusieurs prises sont configurées
+* Corrections HS110 v1 (remontée de la puissance / conso)
+* Prise en charge des exceptions
+
+Version initiale - 18/11/2018
 ===

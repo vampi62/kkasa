@@ -1,0 +1,73 @@
+{
+    "commands": [
+        {
+            "name": "Régler intensité",
+            "logicalId": "setBrightness",
+            "type": "action",
+            "isVisible": 1,
+            "configuration": {
+              "minValue": 0,
+              "maxValue": 100
+            },
+            "value": "brightness",
+            "subtype": "slider",
+            "template": {
+                "dashboard": "light",
+                "mobile": "light"
+            },
+            "display": {
+                "generic_type": "LIGHT_SLIDER"
+            }
+        },
+        {
+            "name": "On",
+            "logicalId": "lightOn",
+            "type": "action",
+            "isVisible": 0,
+            "value": "brightness",
+            "subtype": "other",
+            "display": {
+                "generic_type": "LIGHT_ON"
+            },
+            "template": {
+                "dashboard": "light",
+                "mobile": "light"
+            }
+        },
+        {
+            "name": "Off",
+            "logicalId": "lightOff",
+            "type": "action",
+            "isVisible": 0,
+            "value": "brightness",
+            "subtype": "other",
+            "display": {
+                "generic_type": "LIGHT_OFF"
+            },
+            "template": {
+                "dashboard": "light",
+                "mobile": "light"
+            }
+        },
+        {
+            "name": "Intensité",
+            "logicalId": "brightness",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 1,
+            "subtype": "numeric",
+            "configuration": {
+                "minValue": 0,
+                "maxValue": 100
+            },
+            "template": {
+                "dashboard": "light",
+                "mobile": "light"
+            },
+            "display": {
+                "generic_type": "LIGHT_STATE"
+            },
+            "unite": "%"
+        }
+    ]
+}
