@@ -18,7 +18,7 @@
 
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
-define('KKASA_COLOR_LIB',__DIR__.'/../../3rparty/phpColors/Color.php');
+define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
 define('KKPA_MIN_VERSION','2.0');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
@@ -32,10 +32,10 @@ if (!class_exists('KKPA\Clients\KKPAApiClient')) {
 		require_once(dirname(__FILE__) . '/../../3rparty/KKPA/autoload.php');
 	}
 }
-if (!class_exists('Mexitek\PHPColors\Color')) {
-	if (file_exists(KKASA_COLOR_LIB))
+if (!class_exists('HSLColor')) {
+	if (file_exists(KKASA_HSLCOLOR_LIB))
 	{
-		require_once(KKASA_COLOR_LIB);
+		require_once(KKASA_HSLCOLOR_LIB);
 	}
 }
 
@@ -276,7 +276,7 @@ class kkasa extends eqLogic {
    		} else {
    			$return['state'] = 'nok';
    		}
-			if ($return['state']=='ok' && !file_exists(KKASA_COLOR_LIB))
+			if ($return['state']=='ok' && !file_exists(KKASA_HSLCOLOR_LIB))
 				$return['state'] = 'nok';
 			log::add(__CLASS__,'debug','Dependancy_info: '.print_r($return,true));
    		return $return;
@@ -585,8 +585,10 @@ class kkasa extends eqLogic {
 					if ($device->is_featured('COL'))
 					{
 						$lightState = $device->getLightState();
-						$hsl = array("H" => $lightState['hue'], "S" => $lightState['saturation']/100, "L" => 0.5);
-						$hex = '#'.Mexitek\PHPColors\Color::hslToHex($hsl);
+						$color = new HSLColor();
+						$color->setHSV($lightState['hue'],$lightState['saturation']/100, $lightState['brightness']/100);
+						$hex = $color->getRGBString();
+						log::add(__CLASS__, 'debug', "GetColor: " . print_r($lightState,true)." => $hex");
 						$changed = $this->setInfo('colorState',$hex) || $changed;
 					}
 
@@ -622,10 +624,14 @@ class kkasa extends eqLogic {
 				try
 				{
 					$temp = ($device->is_featured('TMP')) ? 0 : null;
-					$hsl = Mexitek\PHPColors\Color::hexToHsl($hex);
-					$hue = max(0,min(360,intval($hsl['H'])));
-					$saturation = max(0,min(100,intval($hsl['S']*100)));
-					$device->setLightState($temp,$hue,$saturation,null);
+					$color = new HSLColor();
+					$color->setRGBString($hex);
+					$hsv = $color->getHSV();
+					log::add(__CLASS__, 'debug', "SetColor: $hex => ".print_r($hsv,true));
+					$hue = max(0,min(360,intval($hsv['h'])));
+					$saturation = max(0,min(100,intval($hsv['s']*100)));
+					$brightness = max(0,min(100,intval($hsv['v']*100)));
+					$device->setLightState($temp,$hue,$saturation,$brightness);
 					$this->setInfo('color_temp',0);
 					sleep(1.5);
 					$this->syncRealTime();

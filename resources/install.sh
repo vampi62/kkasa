@@ -25,25 +25,26 @@ echo 40 > ${FILENAME}
 rm -Rf KKPA-${REQ_VERSION}
 echo 45 > ${FILENAME}
 
-echo "* phpColors"
+#echo "* HSL Color"
+echo "* HSL Color"
 echo 50 > ${FILENAME}
 cd $2
 echo 55  > ${FILENAME}
 rm -f master.zip
 echo 60  > ${FILENAME}
-wget https://github.com/mexitek/phpColors/archive/master.zip
+wget https://github.com/philbring/php-hslcolor-class/archive/master.zip
 echo 65 > ${FILENAME}
 unzip -o master.zip
 echo 70 > ${FILENAME}
 rm -f master.zip
 echo 75 > ${FILENAME}
-rm -Rf "$1/phpColors"
+rm -Rf "$1/HSLColor"
 echo 80 > ${FILENAME}
-mkdir "$1/phpColors"
+mkdir "$1/HSLColor"
 echo 85 > ${FILENAME}
-mv -f phpColors-master/src/Mexitek/PHPColors/* "$1/phpColors"
+mv -f php-hslcolor-class-master/HSLColor.class.php "$1/HSLColor"
 echo 90 > ${FILENAME}
-rm -Rf phpColors-master
+rm -Rf php-hslcolor-class-master
 echo 100 > ${FILENAME}
 echo "Everything is successfully installed!"
 rm ${FILENAME}
