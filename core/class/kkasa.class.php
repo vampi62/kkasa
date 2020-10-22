@@ -18,8 +18,8 @@
 
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
-define('KKASA_COLOR_LIB',__DIR__.'/../../3rparty/phpColors/Color.php');
-define('KKPA_MIN_VERSION','2.1.1');
+define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
+define('KKPA_MIN_VERSION','2.1.2');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -32,10 +32,10 @@ if (!class_exists('KKPA\Clients\KKPAApiClient')) {
 		require_once(dirname(__FILE__) . '/../../3rparty/KKPA/autoload.php');
 	}
 }
-if (!class_exists('Mexitek\PHPColors\Color')) {
-	if (file_exists(KKASA_COLOR_LIB))
+if (!class_exists('HSLColor')) {
+	if (file_exists(KKASA_HSLCOLOR_LIB))
 	{
-		require_once(KKASA_COLOR_LIB);
+		require_once(KKASA_HSLCOLOR_LIB);
 	}
 }
 
@@ -277,7 +277,7 @@ class kkasa extends eqLogic {
    		} else {
    			$return['state'] = 'nok';
    		}
-			if ($return['state']=='ok' && !file_exists(KKASA_COLOR_LIB))
+			if ($return['state']=='ok' && !file_exists(KKASA_HSLCOLOR_LIB))
 				$return['state'] = 'nok';
 			log::add(__CLASS__,'debug','Dependancy_info: '.print_r($return,true));
    		return $return;
@@ -569,14 +569,17 @@ class kkasa extends eqLogic {
 
 						$data = $device->getTodayStats();
 						$energy = (array_key_exists('energy',$data)) ? $data['energy'] : 0;
+						log::add(__CLASS__, 'debug', "Today energy: " . $data['energy'] . "/ Moy: $energy");
 						$changed = $this->setInfo('consu_today',$energy) || $changed;
 
 						$data = $device->get7DaysStats();
-						$energy = (array_key_exists('energy',$data)) ? $data['energy']/7.0 : 0;
+						$energy = (array_key_exists('energy',$data)) ? round($data['energy']/7.0) : 0;
+						log::add(__CLASS__, 'debug', "7days energy: " . $data['energy'] . "/ Moy: $energy");
 						$changed = $this->setInfo('consu_7days',$energy) || $changed;
 
 						$data = $device->get30DaysStats();
-						$energy = (array_key_exists('energy',$data)) ? $data['energy']/30.0 : 0;
+						$energy = (array_key_exists('energy',$data)) ? round($data['energy']/30.0) : 0;
+						log::add(__CLASS__, 'debug', "30days energy: " . $data['energy'] . "/ Moy: $energy");
 						$changed = $this->setInfo('consu_30days',$energy) || $changed;
 					}
 
@@ -598,8 +601,10 @@ class kkasa extends eqLogic {
 					if ($device->is_featured('COL'))
 					{
 						$lightState = $device->getLightState();
-						$hsl = array("H" => $lightState['hue'], "S" => $lightState['saturation']/100, "L" => 0.5);
-						$hex = '#'.Mexitek\PHPColors\Color::hslToHex($hsl);
+						$color = new HSLColor();
+						$color->setHSV($lightState['hue'],$lightState['saturation']/100, $lightState['brightness']/100);
+						$hex = $color->getRGBString();
+						log::add(__CLASS__, 'debug', "GetColor: " . print_r($lightState,true)." => $hex");
 						$changed = $this->setInfo('colorState',$hex) || $changed;
 					}
 
