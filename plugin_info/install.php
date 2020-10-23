@@ -40,6 +40,8 @@ function kkasa_update() {
   }
   $kkasa_version = config::byKey('version','kkasa','1.0');
   log::add('kkasa', 'debug', "Update kkasa from ".$kkasa_version . " to ".KKASA_VERSION);
+  $kkasa = plugin::ById('kkasa');
+  $kkasa->dependancy_install();
 
   if (version_compare($kkasa_version,'1.1','<'))
   {
@@ -52,6 +54,16 @@ function kkasa_update() {
   {
     foreach (eqLogic::byType('kkasa') as $eqLogic) {
       $eqLogic->addLedCmd();
+    }
+  }
+
+  if (version_compare($kkasa_version,'2.1','<'))
+  {
+    foreach (eqLogic::byType('kkasa') as $eqLogic) {
+      $eqLogic->setConfiguration('features',$eqLogic->featureString());
+      $eqLogic->save();
+      if ($eqLogic->is_featured('ENE'))
+        $eqLogic->loadCmdFromConf('power',false);
     }
   }
 

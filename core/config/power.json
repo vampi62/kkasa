@@ -41,6 +41,33 @@
             "isHistorized": 1,
             "subtype": "numeric",
             "unite": "WH"
+        },
+        {
+            "name": "Consommation du jour",
+            "logicalId": "consu_today",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 1,
+            "subtype": "numeric",
+            "unite": "WH"
+        },
+        {
+            "name": "Moy conso sur 7 jours",
+            "logicalId": "consu_7days",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "subtype": "numeric",
+            "unite": "WH"
+        },
+        {
+            "name": "Moy conso sur 30 jours",
+            "logicalId": "consu_30days",
+            "type": "info",
+            "isVisible": 0,
+            "isHistorized": 0,
+            "subtype": "numeric",
+            "unite": "WH"
         }
     ]
 }
