@@ -23,4 +23,4 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
  *
  *
  */
-define('KKASA_VERSION','2.1');
+define('KKASA_VERSION','2.3');

@@ -1,5 +1,5 @@
 FILENAME="$2/dependancy_kkasa_in_progress"
-REQ_VERSION="2.0"
+REQ_VERSION="2.1.2"
 echo "Destination is $1"
 echo "Tmp folder is $2"
 touch ${FILENAME}
@@ -25,7 +25,6 @@ echo 40 > ${FILENAME}
 rm -Rf KKPA-${REQ_VERSION}
 echo 45 > ${FILENAME}
 
-#echo "* HSL Color"
 echo "* HSL Color"
 echo 50 > ${FILENAME}
 cd $2

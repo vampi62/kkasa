@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.0');
+define('KKPA_MIN_VERSION','2.1.2');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -222,6 +222,7 @@ class kkasa extends eqLogic {
  					$kkasa->setConfiguration('sw_ver', $sysinfo['sw_ver']);
  					$kkasa->setConfiguration('fwId', $sysinfo['fwId']);
  					$kkasa->setConfiguration('oemId', $sysinfo['oemId']);
+					$kkasa->setConfiguration('features',$kkasa->featureString());
  					$kkasa->save();
  			 }
  		 }
@@ -565,6 +566,21 @@ class kkasa extends eqLogic {
 							if ($cmd_name != '')
 								$changed = $this->setInfo($cmd_name,$value) || $changed;
 						}
+
+						$data = $device->getTodayStats();
+						$energy = (array_key_exists('energy',$data)) ? $data['energy'] : 0;
+						log::add(__CLASS__, 'debug', "Today energy: " . $data['energy'] . "/ Moy: $energy");
+						$changed = $this->setInfo('consu_today',$energy) || $changed;
+
+						$data = $device->get7DaysStats();
+						$energy = (array_key_exists('energy',$data)) ? round($data['energy']/7.0) : 0;
+						log::add(__CLASS__, 'debug', "7days energy: " . $data['energy'] . "/ Moy: $energy");
+						$changed = $this->setInfo('consu_7days',$energy) || $changed;
+
+						$data = $device->get30DaysStats();
+						$energy = (array_key_exists('energy',$data)) ? round($data['energy']/30.0) : 0;
+						log::add(__CLASS__, 'debug', "30days energy: " . $data['energy'] . "/ Moy: $energy");
+						$changed = $this->setInfo('consu_30days',$energy) || $changed;
 					}
 
 					if ($device->is_featured('DIM'))
@@ -791,14 +807,24 @@ class kkasa extends eqLogic {
 			switch($this->getConfiguration('type'))
 			{
 				case 'IOT.SMARTPLUGSWITCH':
-					return 'hs110.jpg';
-					break;
+					switch (substr($this->getConfiguration('model',''),0,5))
+					{
+						case 'HS100':
+							return 'hs110.png';
+							break;
+						case 'HS110':
+							return 'hs110.png';
+							break;
+						default:
+							return 'plug.png';
+							break;
+					}						
 
 				case 'IOT.SMARTBULB':
 					switch (substr($this->getConfiguration('model',''),0,5))
 					{
 						case 'LB100':
-							return 'lb100.jpg';
+							return 'lb100.png';
 							break;
 
 						case 'LB120':
@@ -806,7 +832,7 @@ class kkasa extends eqLogic {
 							break;
 
 						case 'LB130':
-							return 'lb130.jpg';
+							return 'lb130.png';
 							break;
 					}
 					break;
