@@ -194,6 +194,12 @@ foreach ($eqLogics as $eqLogic) {
 										<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="features"/>
 								 </div>
 							</div>
+							<div class="form-group">
+								 <label class="col-sm-3 control-label">{{Children}}</label>
+								 <div class="col-sm-6">
+										<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="children"/>
+								 </div>
+							</div>
 						</fieldset>
 					</form>
 				</div>
@@ -241,6 +247,11 @@ foreach ($eqLogics as $eqLogic) {
 							<div class="form-group">
 								<a class="btn btn-danger bt_kkasaCreateCmd" dataCmdType="color">
 									<i class="fa fa-search"></i> {{Recharger commandes couleur}}
+								</a>
+							</div>
+							<div class="form-group">
+								<a class="btn btn-danger bt_kkasaCreateCmd" dataCmdType="multi">
+									<i class="fa fa-search"></i> {{Recharger commandes multiprises}}
 								</a>
 							</div>
 						</fieldset>

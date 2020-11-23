@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.1.2');
+define('KKPA_MIN_VERSION','2.1.3');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -41,12 +41,13 @@ if (!class_exists('HSLColor')) {
 
 class kkasa extends eqLogic {
 		const FEATURES = array(
-			"TIM" => 'plug',
-			"ENE" => 'power',
-			"LED" => 'led',
-			'DIM' => 'bulb',
-			'TMP' => 'temp',
-			'COL' => 'color'
+			"TIM" => array('file' => 'plug'),
+			"ENE" => array('file' => 'power'),
+			"LED" => array('file' => 'led'),
+			'DIM' => array('file' => 'bulb'),
+			'TMP' => array('file' => 'temp'),
+			'COL' => array('file' => 'color'),
+			'MUL' => array('file' => 'multiSlots', 'multi' => true)
 		);
 
     /*     * *************************Attributs****************************** */
@@ -173,6 +174,7 @@ class kkasa extends eqLogic {
 			if ($device->is_featured('DIM')) $result[] = 'DIM';
 			if ($device->is_featured('TMP')) $result[] = 'TMP';
 			if ($device->is_featured('COL')) $result[] = 'COL';
+			if ($device->is_featured('MUL')) $result[] = 'MUL';
 			return implode("|",$result);
 		}
 
@@ -437,6 +439,12 @@ class kkasa extends eqLogic {
 					$fwId				 = $sysinfo['fwId'];
 					$oemId			 = $sysinfo['oemId'];
 					$deviceHwVer = $sysinfo['hw_ver'];
+					$children    = array();
+					if ($sysinfo['children'] != '')
+					{
+						foreach($sysinfo['children'] as $child)
+							$children[] = array('id'=>$child['id'],'name'=>$child['alias']);
+					}
 
 	  			$eqLogic = kkasa::byLogicalId($deviceId, 'kkasa');
 	  			if (!is_object($eqLogic)) {
@@ -469,6 +477,7 @@ class kkasa extends eqLogic {
 								$device->getVariable('local_port',9999)
 							);
 						}
+						$eqLogic->setConfiguration('children', json_encode($children));
 
 	  				$eqLogic->setEqType_name('kkasa');
 	  				$eqLogic->setIsVisible(1);
@@ -506,7 +515,7 @@ class kkasa extends eqLogic {
 				log::add(__CLASS__, 'debug', "ERROR device is null on line ".__LINE__);
 				throw new Exception("Device is null");
 			}
-			log::add('kkasa','debug','Processing refresh of '.$device->getVariable('deviceId',''));
+			log::add(__CLASS__,'debug','Processing refresh of '.$device->getVariable('deviceId',''));
 			while((!$success) && $attempt < 3)
 			{
 				try
@@ -514,6 +523,16 @@ class kkasa extends eqLogic {
 		      $sysinfo = $device->getSysInfo();
 					$this->refresh();
 					$changed = $this->setInfo('state',$device->getState()) || $changed;
+					if ($device->is_featured('MUL'))
+					{
+						$ids = $device->getAllIds();
+						log::add(__CLASS__,'debug','Slots list: '.print_r($ids,true));
+						foreach($ids as $key => $id)
+						{
+							log::add(__CLASS__,'debug','Change slot state '.print_r($id,true));
+							$changed = $this->setInfo($id.'_state',$device->getSlotState($id)) || $changed;
+						}
+					}
 					$changed = $this->setInfo('rssi',$sysinfo['rssi']) || $changed;
 					if ($device->is_featured('LED'))
 						$changed = $this->setInfo('ledState',(!$sysinfo['led_off'])) || $changed;
@@ -524,6 +543,7 @@ class kkasa extends eqLogic {
 					if ($device->is_featured('ENE'))
 					{
 						$data = $device->getRealTime();
+						log::add(__CLASS__,'debug','RealTime: '.print_r($data,true));
 						foreach($data as $key => $value)
 						{
 							switch($key)
@@ -557,6 +577,52 @@ class kkasa extends eqLogic {
 									break;
 								case 'total':
 									$cmd_name = 'consumption';
+									break;
+								case 'children':
+									foreach($value as $child_key => $child_data)
+									{
+										foreach($child_data as $key => $value)
+										{
+											$cmd_name = '';
+											switch($key)
+											{
+												case 'power_mw':
+													$cmd_name = $child_key.'_power';
+													$value = $value/1000;
+													break;
+												case 'power':
+													$cmd_name = $child_key.'_power';
+													$value = $value;
+													break;
+												case 'voltage':
+													$cmd_name = $child_key.'_voltage';
+													$value = $value;
+													break;
+												case 'current_ma':
+													$cmd_name = $child_key.'_current';
+													$value = $value/1000;
+													break;
+												case 'current':
+													$cmd_name = $child_key.'_current';
+													$value = $value;
+													break;
+												case 'total_wh':
+													$cmd_name = $child_key.'_consumption';
+													$value = $value;
+													break;
+												case 'total':
+													$cmd_name = $child_key.'_consumption';
+													$value = $value;
+													break;
+												default:
+													$cmd_name = '';
+													continue;
+											}
+											if ($cmd_name != '')
+												$changed = $this->setInfo($cmd_name,$value) || $changed;
+										}
+									}
+									$cmd_name = '';
 									break;
 								default:
 									$cmd_name = '';
@@ -774,6 +840,48 @@ class kkasa extends eqLogic {
 			}
 		}
 
+		public function setSlotState($id,$state)
+		{
+			log::add(__CLASS__, 'debug', "Change slot state of $id to $state");
+			$device = $this->getDevice();
+			$success = false;
+			if ($device->is_featured('MUL'))
+			{
+				$attempt = 0;
+				while ((!$success) && $attempt < 3)
+				{
+					try
+					{
+						$state = boolval($state);
+						if ($state)
+						{
+							$device->switchSlotOn($id);
+						} else {
+							$device->switchSlotOff($id);
+						}
+						sleep(1.5);
+						$this->syncRealTime();
+						$success = true;
+					}
+					catch(Exception $ex)
+					{
+						$attempt++;
+						log::add(__CLASS__, 'debug', "ERROR during request - attempt #".$attempt . "/3");
+						log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
+						if ($attempt>2)
+						{
+							$this->setInfo('offline',1);
+							throw $ex;
+						}
+					}
+				}
+			} else {
+				log::add(__CLASS__, 'error', "Device ".$this->getName() . " does not manage slots");
+				throw new Exception("Device ".$this->getName() . " does not manage slots");
+			}
+
+		}
+
 		public function toogleLedState()
 		{
 			$device = $this->getDevice();
@@ -818,7 +926,7 @@ class kkasa extends eqLogic {
 						default:
 							return 'plug.png';
 							break;
-					}						
+					}
 
 				case 'IOT.SMARTBULB':
 					switch (substr($this->getConfiguration('model',''),0,5))
@@ -860,12 +968,24 @@ class kkasa extends eqLogic {
 
 		public function loadCmdFromConf($cmd='all',$force=0) {
 			//$device = $this->getDevice();
+			$children = json_decode($this->getConfiguration('children',''),true);
+			if (is_null($children) || !is_array($children))
+				$children = array(array('id'=>'','name'=>''));
 			if ($cmd!='all')
-				$cmdSets = array($cmd);
+			{
+				foreach(self::FEATURES as $feature => $cmdType)
+				{
+					if ($feature == $cmd && $this->is_featured($feature))
+					{
+						$cmdSets[] = $cmdType;
+					}
+				}
+			}
+				//$cmdSets = array($cmd);
 			else {
 				foreach($this->getCmd() as $curCmd)
 					$curCmd->remove();
-				$cmdSets = array('basic');
+				$cmdSets = array(array('file'=>'basic'));
 				foreach(self::FEATURES as $feature => $cmdType)
 				{
 					if ($this->is_featured($feature))
@@ -877,7 +997,8 @@ class kkasa extends eqLogic {
 			$nb_cmd = 0;
 			foreach($cmdSets as $cmdSet)
 			{
-				$filename = dirname(__FILE__) . '/../config/' . $cmdSet.'.json';
+				$filename = dirname(__FILE__) . '/../config/' . $cmdSet['file'].'.json';
+				log::add(__CLASS__, 'debug', "Loading ". $cmdSet['file']. " commands (".intval($cmdSet['multi']).")",true);
 				if (!is_file($filename)) {
 					throw new \Exception("File $filename does not exist");
 				}
@@ -885,33 +1006,75 @@ class kkasa extends eqLogic {
 				if (!is_array($device) || !isset($device['commands'])) {
 					break;
 				}
-				foreach($device['commands'] as $key => $cmd)
+				$conf = array('commands'=>array());
+				if ($cmdSet['multi'])
 				{
-					if (array_key_exists('logicalId',$cmd))
-						$id = $cmd['logicalId'];
-					else
+					foreach($children as $child)
 					{
-						if (array_key_exists('name',$cmd))
-							$id = $cmd['name'];
-						else {
-							$id = '';
+						foreach($device['commands'] as $key => $cmd)
+						{
+							$res_cmd = array_merge($cmd,array());
+							//$conf['commands'][] = array_merge($cmd,array());
+							if (array_key_exists('logicalId',$cmd))
+								$id = str_replace('%id%',$child['id'],$cmd['logicalId']);
+							else
+							{
+								if (array_key_exists('name',$cmd))
+									$id = str_replace('%name%',$child['name'],$cmd['name']);
+								else {
+									$id = '';
+								}
+							}
+							$curCmd = $this->getCmd(null, $id);
+							if ($force==1 && is_object($curCmd)) {
+								$curCmd->remove();
+							} elseif (($force == 0) && is_object($curCmd)) {
+								unset($res_cmd);
+								//array_pop($conf['commands']);
+								//unset($conf['commands'][$key]);
+								continue;
+							}
+							$res_cmd['logicalId'] = $id;
+							if (array_key_exists('name',$res_cmd))
+								$res_cmd['name'] = str_replace('%name%',$child['name'],__($res_cmd['name'],__FILE__));
+							if (array_key_exists('value',$res_cmd))
+								$res_cmd['value'] = str_replace('%id%',$child['id'],$res_cmd['value']);
+							$conf['commands'][] = $res_cmd;
 						}
 					}
-					$curCmd = $this->getCmd(null, $id);
-					if ($force==1 && is_object($curCmd)) {
-						$curCmd->remove();
-					} elseif (($force == 0) && is_object($curCmd)) {
-						unset($device['commands'][$key]);
-						continue;
+				} else {
+					foreach($device['commands'] as $key => $cmd)
+					{
+						$res_cmd = array_merge($cmd,array());
+						if (array_key_exists('logicalId',$cmd))
+							$id = $cmd['logicalId'];
+						else
+						{
+							if (array_key_exists('name',$cmd))
+								$id = $cmd['name'];
+							else {
+								$id = '';
+							}
+						}
+						$curCmd = $this->getCmd(null, $id);
+						if ($force==1 && is_object($curCmd)) {
+							$curCmd->remove();
+						} elseif (($force == 0) && is_object($curCmd)) {
+							unset($conf['commands'][$key]);
+							continue;
+						}
+						$res_cmd['logicalId'] = $id;
+						if (array_key_exists('name',$cmd))
+							$res_cmd['name'] = __($cmd['name'],__FILE__);
+						$conf['commands'][] = $res_cmd;
 					}
-					if (array_key_exists('name',$cmd))
-						$cmd['name'] = __($cmd['name'],__FILE__);
 				}
-				if (count($device['commands'])>0)
+				if (count($conf['commands'])>0)
 				{
-					$this->import($device);
+					log::add(__CLASS__, 'debug', "Import ". print_r($conf,true),true);
+					$this->import($conf);
 				}
-				$nb_cmd += count($device['commands']);
+				$nb_cmd += count($conf['commands']);
 			}
 			return $nb_cmd;
 		}
@@ -1031,7 +1194,7 @@ class kkasa extends eqLogic {
 						}
 						$cmd_order++;
 					} catch (Exception $exc) {
-						log::error('kkasa','error','Error importing '.$command['name']);
+						log::add(__CLASS__,'error','Error importing '.$command['name']);
 						throw $exc;
 					}
 					$cmd->event('');
@@ -1099,6 +1262,18 @@ class kkasaCmd extends cmd {
 			}
 			if ($this->getLogicalId() == 'off') {
 				$eqLogic->setState(0);
+			}
+			$pos = strpos($this->getLogicalId(),'_on');
+			if($pos)
+			{
+				$id = substr($this->getLogicalId(),0,$pos);
+				$eqLogic->setSlotState($id,1);
+			}
+			$pos = strpos($this->getLogicalId(),'_off');
+			if($pos)
+			{
+				$id = substr($this->getLogicalId(),0,$pos);
+				$eqLogic->setSlotState($id,0);
 			}
 			if ($this->getLogicalId() == 'toogleLed') {
 				$eqLogic->toogleLedState();

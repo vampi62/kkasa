@@ -243,6 +243,7 @@ $(document).ready(function() {
       show_hide_create_cmd_button('DIM','bulb');
       show_hide_create_cmd_button('TMP','temp');
       show_hide_create_cmd_button('COL','color');
+      show_hide_create_cmd_button('MUL','multi');
 
       /*if(is_feature('TIM'))
         $(".bt_kkasaCreateCmd[dataCmdType='plug']").show();
