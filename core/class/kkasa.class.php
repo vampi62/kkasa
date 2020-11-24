@@ -923,6 +923,9 @@ class kkasa extends eqLogic {
 						case 'HS110':
 							return 'hs110.png';
 							break;
+						case 'HS300':
+							return 'hs300.png';
+							break;
 						default:
 							return 'plug.png';
 							break;
