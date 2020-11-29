@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.1.3');
+define('KKPA_MIN_VERSION','2.2');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -424,10 +424,11 @@ class kkasa extends eqLogic {
 			log::add(__CLASS__, 'debug',"SCAN: ".count($devicelist)." devices found");
 			$nb_devices = 0;
   		foreach ($devicelist as $device) {
-				log::add(__CLASS__, 'debug',$device->toString());
+				log::add(__CLASS__, 'debug',get_class($device).': '.$device->toString());
 				try
 				{
 	        $sysinfo     = $device->getSysInfo();
+					log::add(__CLASS__, 'debug','Sysinfo: '.print_r($sysinfo,true));
 	  			$deviceId    = $sysinfo['deviceId'];
 	  			$alias       = $sysinfo['alias'];
 	  			$type  			 = $sysinfo['type'];
