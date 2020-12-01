@@ -872,16 +872,27 @@ class kkasa extends eqLogic {
 				case 'IOT.SMARTPLUGSWITCH':
 					switch (substr($this->getConfiguration('model',''),0,5))
 					{
+						case 'HS300':
+						case 'KP300':
+						case 'KP200':
+						case 'KP400':
+						case 'KP303':
+							return ($this->getConfiguration('child_id','')=='') ? 'multi1.png' : 'slot1.png';
+							break;
+
+						case 'HS200':
+						case 'HS220':
+							return 'switch1.png';
+							break;
+
 						case 'HS100':
-							return 'hs110.png';
-							break;
+						case 'HS105':
 						case 'HS110':
-							return 'hs110.png';
-							break;
 						default:
-							return 'plug.png';
+							return 'plug1.png';
 							break;
 					}
+					break;
 
 				case 'IOT.SMARTBULB':
 					switch (substr($this->getConfiguration('model',''),0,5))
