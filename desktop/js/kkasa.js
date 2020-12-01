@@ -167,6 +167,40 @@ $('#btDebug').on('click', function () {
     });
 });
 
+$('#btDeleteAll').on('click', function () {
+    bootbox.confirm('{{Etes-vous sûr de vouloir supprimer tous les équipements kkasa ?}}', function (result) {
+      if (result) {
+        $.ajax({// fonction permettant de faire de l'ajax
+            type: "POST", // methode de transmission des données au fichier php
+            url: "plugins/kkasa/core/ajax/kkasa.ajax.php", // url du fichier php
+            data: {
+                action: "deleteAll",
+            },
+            dataType: 'json',
+            error: function (request, status, error) {
+                handleAjaxError(request, status, error);
+            },
+            success: function (data) { // si l'appel a bien fonctionné
+                if (data.state != 'ok') {
+                    $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                    return;
+                }
+                $('#div_alert').showAlert({message: '{{Suppression de tous les équipements terminée}}', level: 'success'});
+                var vars = getUrlVars();
+                var url = 'index.php?';
+                for (var i in vars) {
+                  if (i != 'id' && i != 'saveSuccessFull' && i != 'removeSuccessFull') {
+                    url += i + '=' + vars[i].replace('#', '') + '&';
+                  }
+                }
+                url += 'removeSuccessFull=1';
+                loadPage(url);
+            }
+        });
+      }
+    });
+});
+
 $('.bt_kkasaCreateCmd').on('click', function () {
   var cmdType = $(this).attr("dataCmdType");
   var dialog_title = '{{Recharge configuration}}';

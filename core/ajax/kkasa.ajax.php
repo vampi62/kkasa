@@ -41,6 +41,9 @@ try {
   	} elseif(init('action') == 'debugInfo') {
       kkasa::getDebugInfo();
       ajax::success();
+    } elseif(init('action') == 'deleteAll') {
+      kkasa::deleteAll();
+      ajax::success();
     } elseif(init('action') == 'createCmd') {
       $id = init('id');
       $device = eqLogic::byId($id);
