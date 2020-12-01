@@ -32,11 +32,11 @@ function kkasa_update() {
   }
   if (config::byKey('offline_log', 'kkasa','-1')=='-1')
   {
-    config::save('offline_log', 'error','kkasa');
+    config::save('offline_log', 'debug','kkasa');
   }
   if (config::byKey('cloud', 'kkasa','-1')=='-1')
   {
-    config::save('cloud', '1','kkasa');
+    config::save('cloud', '0','kkasa');
   }
   $kkasa_version = config::byKey('version','kkasa','1.0');
   log::add('kkasa', 'debug', "Update kkasa from ".$kkasa_version . " to ".KKASA_VERSION);
@@ -64,6 +64,16 @@ function kkasa_update() {
       $eqLogic->save();
       if ($eqLogic->is_featured('ENE'))
         $eqLogic->loadCmdFromConf('power',false);
+    }
+  }
+
+  if (version_compare($kkasa_version,'2.4','<'))
+  {
+    foreach (eqLogic::byType('kkasa') as $eqLogic) {
+      $device = $eqLogic->getDevice();
+      $device->getSysInfo();
+      $eqLogic->setConfiguration('deviceId',$eqLogic->getLogicalId());
+      $eqLogic->save();
     }
   }
 

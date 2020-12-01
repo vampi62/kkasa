@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.1.2');
+define('KKPA_MIN_VERSION','2.3');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -85,7 +85,13 @@ class kkasa extends eqLogic {
   		log::add(__CLASS__, 'debug', print_r($client->debug_last_request(),true));
   		foreach ($devicelist as $device) {
 				try {
-					log::add(__CLASS__, 'debug', '***  Device '.$device->getVariable('deviceId',''));
+					log::add(
+						__CLASS__,
+						'debug',
+						'***  Device '
+							.$device->getVariable('deviceId','')
+							.$device->getVariable('child_id','')
+					);
 					$device->getSysInfo();
 		  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
 					if (!is_null($device->getRealTime()))
@@ -104,9 +110,12 @@ class kkasa extends eqLogic {
 		public function getDevice() {
 			if ($this->_device == null) {
 				$client = self::getClient();
-				if (config::byKey('cloud', 'kkasa')==1) {
+				if (config::byKey('cloud', __CLASS__)==1) {
 					try {
-						$this->_device = $client->getDeviceById($this->getLogicalId());
+						$this->_device = $client->getDeviceById(
+							$this->getConfiguration('deviceId'),
+							$this->getConfiguration('child_id')
+						);
 					}
 					catch(KKPA\Exceptions\KKPADeviceException $ex)
 					{
@@ -123,12 +132,15 @@ class kkasa extends eqLogic {
 					$local_ip = $this->getConfiguration('local_ip');
 					$local_port = $this->getConfiguration('local_port',9999);
 					try {
-						$this->_device = $client->getDeviceByIp($local_ip,$local_port);
+						$this->_device = $client->getDeviceByIp($local_ip,$local_port,$this->getConfiguration('child_id'));
 					} catch (KKPA\Exceptions\KKPAClientException $ex) {
 						if ($ex->getCode()==KKPA_NO_ROUTE_TO_HOST) {
 							log::add('kkasa','Info',"Cannot reach $local_ip. Trying to autodetect IP of ".$this->getLogicalId());
 							try {
-								$this->_device = $client->getDeviceById($this->getLogicalId());
+								$this->_device = $client->getDeviceById(
+									$this->getConfiguration('deviceId'),
+									$this->getConfiguration('child_id')
+								);
 								if (is_object($this->_device)) {
 									$local_ip = $this->_device->getVariable('local_ip','');
 									$port_ip = intval($this->_device->getVariable('local_port',9999));
@@ -409,6 +421,16 @@ class kkasa extends eqLogic {
 			);
 		}
 
+		public static function deleteAll() {
+			log::add(__CLASS__, 'debug',"Delete all devices");
+			$eqLogics = eqLogic::byType(__CLASS__);
+			foreach($eqLogics as $eqLogic)
+			{
+				log::add(__CLASS__, 'debug',"Deletion of ".$eqLogic->getName());
+				$eqLogic->remove();
+			}
+		}
+
     public static function syncWithKasa() {
 			if (self::dependancy_info()['state'] == 'nok')
 			{
@@ -427,6 +449,8 @@ class kkasa extends eqLogic {
 				{
 	        $sysinfo     = $device->getSysInfo();
 	  			$deviceId    = $sysinfo['deviceId'];
+					$child_id		 = $device->getVariable('child_id','');
+					$eqLogicalId = $deviceId.$child_id;
 	  			$alias       = $sysinfo['alias'];
 	  			$type  			 = $sysinfo['type'];
 					$fwVer			 = $sysinfo['sw_ver'];
@@ -438,7 +462,7 @@ class kkasa extends eqLogic {
 					$oemId			 = $sysinfo['oemId'];
 					$deviceHwVer = $sysinfo['hw_ver'];
 
-	  			$eqLogic = kkasa::byLogicalId($deviceId, 'kkasa');
+	  			$eqLogic = kkasa::byLogicalId($eqLogicalId, __CLASS__);
 	  			if (!is_object($eqLogic)) {
 	  				$eqLogic = new self();
 	                  foreach (jeeObject::all() as $object) {
@@ -447,8 +471,10 @@ class kkasa extends eqLogic {
 	                          break;
 	                      }
 	                  }
-	  				$eqLogic->setLogicalId($deviceId);
+	  				$eqLogic->setLogicalId($eqLogicalId);
 	  				$eqLogic->setName($alias);
+						$eqLogic->setConfiguration('deviceId', $deviceId);
+						$eqLogic->setConfiguration('child_id', $child_id);
 						$eqLogic->setConfiguration('type', $type);
 						$eqLogic->setConfiguration('sw_ver', $fwVer);
 						$eqLogic->setConfiguration('dev_name', $deviceName);
@@ -470,13 +496,13 @@ class kkasa extends eqLogic {
 							);
 						}
 
-	  				$eqLogic->setEqType_name('kkasa');
+	  				$eqLogic->setEqType_name(__CLASS__);
 	  				$eqLogic->setIsVisible(1);
 	  				$eqLogic->setIsEnable(1);
 	  				$eqLogic->save();
 						$nb_devices++;
 	  			} else {
-						log::add(__CLASS__, 'debug',"$deviceId found but already known");
+						log::add(__CLASS__, 'debug',"$eqLogicalId found but already known");
 					}
 					$eqLogic->refreshWidget();
 				} catch(KKPA\Exceptions\KKPADeviceException $ex)
@@ -487,6 +513,7 @@ class kkasa extends eqLogic {
 							sprintf(
 								__('Equipement %s trouvé mais injoignable. Ignoré',__FILE__),
 								$device->getVariable('deviceId','')
+								.$device->getVariable('child_id','')
 							)
 						);
 					}
@@ -506,7 +533,13 @@ class kkasa extends eqLogic {
 				log::add(__CLASS__, 'debug', "ERROR device is null on line ".__LINE__);
 				throw new Exception("Device is null");
 			}
-			log::add('kkasa','debug','Processing refresh of '.$device->getVariable('deviceId',''));
+			log::add(
+				__CLASS__,
+				'debug',
+				'Processing refresh of '
+					.$device->getVariable('deviceId','')
+					.$device->getVariable('child_id','')
+			);
 			while((!$success) && $attempt < 3)
 			{
 				try
@@ -758,6 +791,36 @@ class kkasa extends eqLogic {
 					}
 					sleep(1.5);
 					$this->syncRealTime();
+
+					// Refresh father
+					if ($this->getConfiguration('child_id','')!='')
+					{
+						log::add(__CLASS__, 'debug',"Refreshing father");
+						$eqLogics = eqLogic::byType(__CLASS__);
+						foreach($eqLogics as $eqLogic)
+						{
+							if ($eqLogic->getConfiguration('deviceId','')==$this->getConfiguration('deviceId','')
+								&& $eqLogic->getConfiguration('child_id','')!=$this->getConfiguration('child_id',''))
+							{
+								$eqLogic->syncRealTime();
+							}
+						}
+					}
+
+					// Refresh children
+					if ($device->has_children())
+					{
+						log::add(__CLASS__, 'debug',"Refreshing children");
+						$eqLogics = eqLogic::byType(__CLASS__);
+						foreach($eqLogics as $eqLogic)
+						{
+							if ($eqLogic->getConfiguration('deviceId','')==$this->getConfiguration('deviceId','')
+								&& $eqLogic->getConfiguration('child_id','')!='')
+							{
+								$eqLogic->syncRealTime();
+							}
+						}
+					}
 					$success = true;
 				}
 				catch(Exception $ex)
@@ -818,7 +881,7 @@ class kkasa extends eqLogic {
 						default:
 							return 'plug.png';
 							break;
-					}						
+					}
 
 				case 'IOT.SMARTBULB':
 					switch (substr($this->getConfiguration('model',''),0,5))

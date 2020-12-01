@@ -45,6 +45,11 @@ foreach ($eqLogics as $eqLogic) {
     		<br />
     		<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676">{{Debug Infos}}</span>
   		</div>
+			<div class="cursor eqLogicAction" id="btDeleteAll" style="text-align: center; background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
+				<i class="fa fa-trash" style="font-size : 6em;color:#767676;"></i>
+				<br />
+				<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676">{{Supprimer tout}}</span>
+			</div>
 <?php } ?>
 		</div>
 		<legend><i class="fa fa-table"></i> {{Mes périphériques}}</legend>
@@ -122,6 +127,22 @@ foreach ($eqLogics as $eqLogic) {
 								      <input disabled class="eqLogicAttr configuration form-control" data-l1key="logicalId"/>
 					        </div>
 					    </div>
+							<?php
+							if (intval(log::getLogLevel('kkasa')) <=100)
+							{
+								?>
+							<div class="form-group">
+								 <label class="col-sm-3 control-label">{{DeviceId}}</label>
+								 <div class="col-sm-6">
+										<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="deviceId"/>
+								 </div>
+							</div>
+							<div class="form-group">
+								 <label class="col-sm-3 control-label">{{ChildId}}</label>
+								 <div class="col-sm-6">
+										<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="child_id"/>
+								 </div>
+							</div>
 							<div class="form-group">
 								 <label class="col-sm-3 control-label">{{Type}}</label>
 								 <div class="col-sm-6">
@@ -194,6 +215,7 @@ foreach ($eqLogics as $eqLogic) {
 										<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="features"/>
 								 </div>
 							</div>
+							<?php } ?>
 						</fieldset>
 					</form>
 				</div>
