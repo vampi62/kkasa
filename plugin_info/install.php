@@ -20,12 +20,15 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 require_once dirname(__FILE__) . '/../core/php/kkasa.inc.php';
 
 function kkasa_install() {
+  log::add('kkasa', 'debug', "kkasa_install()");
+  // kkasa_update();
   config::save('cron_freq', '15','kkasa');
-  config::save('cloud', '1','kkasa');
+  config::save('cloud', '0','kkasa');
   config::save('version',KKASA_VERSION,'kkasa');
 }
 
 function kkasa_update() {
+  log::add('kkasa', 'debug', "kkasa_update()");
   if (config::byKey('cron_freq', 'kkasa','-1')=='-1')
   {
     config::save('cron_freq', '15','kkasa');
@@ -41,7 +44,13 @@ function kkasa_update() {
   $kkasa_version = config::byKey('version','kkasa','1.0');
   log::add('kkasa', 'debug', "Update kkasa from ".$kkasa_version . " to ".KKASA_VERSION);
   $kkasa = plugin::ById('kkasa');
-  $kkasa->dependancy_install();
+  try {
+    $kkasa->dependancy_install();
+  } catch (\Exception $e)
+  {
+    log::add('kkasa', 'error', "Error during dependancy install ".print_r($e,true));
+  }
+
 
   if (version_compare($kkasa_version,'1.1','<'))
   {
@@ -67,11 +76,9 @@ function kkasa_update() {
     }
   }
 
-  if (version_compare($kkasa_version,'2.4','<'))
+  if (version_compare($kkasa_version,'2.4.1','<'))
   {
     foreach (eqLogic::byType('kkasa') as $eqLogic) {
-      $device = $eqLogic->getDevice();
-      $device->getSysInfo();
       $eqLogic->setConfiguration('deviceId',$eqLogic->getLogicalId());
       $eqLogic->save();
     }
