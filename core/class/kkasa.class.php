@@ -89,9 +89,8 @@ class kkasa extends eqLogic {
 						__CLASS__,
 						'debug',
 						'***  Device '
-							.$this->getLogicalId()
-							// $device->getVariable('deviceId','')
-							// .$device->getVariable('child_id','')
+							.$device->getVariable('deviceId','')
+							.$device->getVariable('child_id','')
 					);
 					$device->getSysInfo();
 		  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
