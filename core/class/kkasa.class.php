@@ -594,10 +594,13 @@ class kkasa extends eqLogic {
 									break;
 								default:
 									$cmd_name = '';
-									continue 2;
 							}
 							if ($cmd_name != '')
+							{
 								$changed = $this->setInfo($cmd_name,$value) || $changed;
+							} else {
+								continue;
+							}
 						}
 
 						$data = $device->getTodayStats();
