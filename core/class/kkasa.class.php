@@ -89,8 +89,9 @@ class kkasa extends eqLogic {
 						__CLASS__,
 						'debug',
 						'***  Device '
-							.$device->getVariable('deviceId','')
-							.$device->getVariable('child_id','')
+							.$this->getLogicalId()
+							// $device->getVariable('deviceId','')
+							// .$device->getVariable('child_id','')
 					);
 					$device->getSysInfo();
 		  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
@@ -450,7 +451,7 @@ class kkasa extends eqLogic {
 	        $sysinfo     = $device->getSysInfo();
 	  			$deviceId    = $sysinfo['deviceId'];
 					$child_id		 = $device->getVariable('child_id','');
-					$eqLogicalId = $deviceId.$child_id;
+					$eqLogicalId = ($child_id=='') ? $deviceId : $child_id;
 	  			$alias       = $sysinfo['alias'];
 	  			$type  			 = $sysinfo['type'];
 					$fwVer			 = $sysinfo['sw_ver'];
@@ -512,7 +513,7 @@ class kkasa extends eqLogic {
 						log::add(__CLASS__, 'warning',
 							sprintf(
 								__('Equipement %s trouvé mais injoignable. Ignoré',__FILE__),
-								$device->getVariable('deviceId','')
+								$device->getVariable('deviceId','').' / '
 								.$device->getVariable('child_id','')
 							)
 						);
@@ -537,8 +538,9 @@ class kkasa extends eqLogic {
 				__CLASS__,
 				'debug',
 				'Processing refresh of '
-					.$device->getVariable('deviceId','')
-					.$device->getVariable('child_id','')
+					.$this->getLogicalId()
+					// $device->getVariable('deviceId','')
+					// .$device->getVariable('child_id','')
 			);
 			while((!$success) && $attempt < 3)
 			{

@@ -50,27 +50,28 @@ function kkasa_update() {
   {
     log::add('kkasa', 'error', "Error during dependancy install ".print_r($e,true));
   }
-
+  $eqLogics = eqLogic::byType('kkasa');
+  $changed = false;
 
   if (version_compare($kkasa_version,'1.1','<'))
   {
-    foreach (eqLogic::byType('kkasa') as $eqLogic) {
+    foreach ($eqLogics as $eqLogic) {
       addCmd($eqLogic,'rssi','info','numeric',__('Force signal',__FILE__),0,1,'dBm');
     }
   }
 
   if (version_compare($kkasa_version,'1.91','<'))
   {
-    foreach (eqLogic::byType('kkasa') as $eqLogic) {
+    foreach ($eqLogics as $eqLogic) {
       $eqLogic->addLedCmd();
     }
   }
 
   if (version_compare($kkasa_version,'2.1','<'))
   {
-    foreach (eqLogic::byType('kkasa') as $eqLogic) {
-      $eqLogic->setConfiguration('features',$eqLogic->featureString());
-      $eqLogic->save();
+    foreach ($eqLogics as $eqLogic) {
+      $changed = $eqLogic->setConfiguration('features',$eqLogic->featureString()) || $changed;
+      // $eqLogic->save();
       if ($eqLogic->is_featured('ENE'))
         $eqLogic->loadCmdFromConf('power',false);
     }
@@ -78,8 +79,25 @@ function kkasa_update() {
 
   if (version_compare($kkasa_version,'2.4.1','<'))
   {
-    foreach (eqLogic::byType('kkasa') as $eqLogic) {
-      $eqLogic->setConfiguration('deviceId',$eqLogic->getLogicalId());
+    foreach ($eqLogics as $eqLogic) {
+      $changed = $eqLogic->setConfiguration('deviceId',$eqLogic->getLogicalId()) || $changed;
+      // $eqLogic->save();
+    }
+  }
+
+  if (version_compare($kkasa_version,'2.4.2','<'))
+  {
+    foreach ($eqLogics as $eqLogic) {
+      if ($eqLogic->getConfiguration('child_id','') != '')
+      {
+        $changed = $eqLogic->setLogicalId($eqLogic->getConfiguration('child_id','')) || $changed;
+      }
+    }
+  }
+
+  if ($changed)
+  {
+    foreach ($eqLogics as $eqLogic) {
       $eqLogic->save();
     }
   }
