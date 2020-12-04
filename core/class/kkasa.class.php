@@ -89,7 +89,7 @@ class kkasa extends eqLogic {
 						__CLASS__,
 						'debug',
 						'***  Device '
-							.$device->getVariable('deviceId','')
+							.$device->getVariable('deviceId',''). ' / '
 							.$device->getVariable('child_id','')
 					);
 					$device->getSysInfo();
@@ -594,8 +594,7 @@ class kkasa extends eqLogic {
 									break;
 								default:
 									$cmd_name = '';
-									continue;
-
+									continue 2;
 							}
 							if ($cmd_name != '')
 								$changed = $this->setInfo($cmd_name,$value) || $changed;
