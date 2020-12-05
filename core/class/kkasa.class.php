@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.3');
+define('KKPA_MIN_VERSION','2.3.1');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -58,20 +58,20 @@ class kkasa extends eqLogic {
     public static function getClient() {
       if (self::$_client == null) {
         self::$_client =  new KKPA\Clients\KKPAApiClient(array(
-          'username' => config::byKey('username', 'kkasa'),
-          'password' => config::byKey('password', 'kkasa'),
-          'cloud' => config::byKey('cloud', 'kkasa'),
+          'username' => config::byKey('username', __CLASS__),
+          'password' => config::byKey('password', __CLASS__),
+          'cloud' => config::byKey('cloud', __CLASS__),
         ));
       }
-			if (config::byKey('cloud', 'kkasa')==1) {
+			if (config::byKey('cloud', __CLASS__)==1) {
 	      try
 	      {
 	        self::$_client->getAccessToken();
 	      }
 	      catch(KKPA\Exceptions\KKPAClientException $ex)
 	      {
-	        $error_msg = "An error happened  while trying to retrieve your tokens \n" . $ex->getMessage() . "\n";
-	        log::add('kkasa', 'debug', $error_msg);
+	        $error_msg = "[Global] An error happened  while trying to retrieve your tokens \n" . $ex->getMessage() . "\n";
+	        log::add(__CLASS__, 'debug', $error_msg);
 	      }
 			}
       return self::$_client;
@@ -79,8 +79,18 @@ class kkasa extends eqLogic {
 
 		public static function getDebugInfo() {
 			$ex = null;
+			$conf = array(
+				'username' 		=> (config::byKey('username', __CLASS__)) ? '***' : 'Undefined',
+				'password' 		=> (config::byKey('password', __CLASS__)) ? '***' : 'Undefined',
+				'cloud' 			=> config::byKey('cloud', __CLASS__),
+				'cron_freq' 	=> config::byKey('cron_freq', __CLASS__),
+				'offline_log' => config::byKey('offline_log', __CLASS__)
+			);
+  		log::add(__CLASS__, 'debug', '*** Conf:');
+  		log::add(__CLASS__, 'debug', print_r($conf,true));
 			$client = self::getClient();
   		$devicelist = $client->getDeviceList();
+  		log::add(__CLASS__, 'debug', $client->toString());
   		log::add(__CLASS__, 'debug', '*** DeviceList:');
   		log::add(__CLASS__, 'debug', print_r($client->debug_last_request(),true));
   		foreach ($devicelist as $device) {
@@ -241,7 +251,8 @@ class kkasa extends eqLogic {
 		}
 
 	 public static function cronExec() {
-		 foreach (self::byType('kkasa') as $kkasa) {
+		 log::add(__CLASS__ ,'debug','[Global] Cron Execution');
+		 foreach (self::byType(__CLASS__) as $kkasa) {
 			 try {
 				 if ($kkasa->getIsEnable())
 				 {
@@ -253,7 +264,7 @@ class kkasa extends eqLogic {
 				{
 					$log_level = config::byKey('offline_log', __CLASS__,'error');
 					if ($log_level!='error')
-						log::add(__CLASS__,$log_level,"Device is offline");
+						log::add(__CLASS__,$log_level,sprintf('[%1$s] Device is offline',$kkasa->getLogicalId()));
 					else
 						throw $ex;
 				} else {
@@ -264,16 +275,17 @@ class kkasa extends eqLogic {
 	 }
 
    public static function dependancy_info() {
-		  log::add(__CLASS__ . '_update','debug','Checking dependancy');
+		 	$log_id = __CLASS__ . '_update';
+		  log::add($log_id,'debug','[Dep] Checking dependancy');
    		$return = array();
-   		$return['log'] = 'kkasa_update';
-   		$return['progress_file'] =  jeedom::getTmpFolder('kkasa') . '/dependancy_kkasa_in_progress';
+   		$return['log'] = $log_id;
+   		$return['progress_file'] =  jeedom::getTmpFolder(__CLASS__) . '/dependancy_kkasa_in_progress';
    		if (file_exists(__DIR__.'/../../3rparty/KKPA/Clients/KKPAApiClient.php')) {
 				try {
 					if (version_compare(KKPA\Clients\KKPAApiClient::getVersion(),KKPA_MIN_VERSION,'<'))
 					{
 						log::add(__CLASS__,'error',
-							__('Nouvelle version des dépendance requise. Merci de réinstaller les dépendances de kkasa',__FILE__)
+							__('[Dep] Nouvelle version des dépendance requise. Merci de réinstaller les dépendances de kkasa',__FILE__)
 						);
 		   			$return['state'] = 'nok';
 					} else
@@ -291,16 +303,17 @@ class kkasa extends eqLogic {
    		}
 			if ($return['state']=='ok' && !file_exists(KKASA_HSLCOLOR_LIB))
 				$return['state'] = 'nok';
-			log::add(__CLASS__,'debug','Dependancy_info: '.print_r($return,true));
+			log::add(__CLASS__,'debug','[Dep] Dependancy_info: '.print_r($return,true));
    		return $return;
    	}
 
     public static function dependancy_install() {
-  		log::remove(__CLASS__ . '_update');
+ 		 	$log_id = __CLASS__ . '_update';
+  		log::remove($log_id);
       $path_3rd_party = __DIR__.'/../../3rparty/';
   		return array(
 				'script' => __DIR__ . '/../../resources/install.sh ' . $path_3rd_party . ' ' . jeedom::getTmpFolder('kkasa'),
-				'log' => log::getPathToLog(__CLASS__ . '_update')
+				'log' => log::getPathToLog($log_id)
 			);
   	}
 
@@ -1038,7 +1051,9 @@ class kkasa extends eqLogic {
 			if (is_object($cmd)) {
 				$cmd->refresh();
 				$changed = $this->checkAndUpdateCmd($cmd_name, $value);
-				log::add('kkasa','debug','set: '.$cmd->getName().' to '. $value);
+				$logstr = '[%1$s] set: %2$s to %3$s';
+				$log = sprintf($logstr,$this->getLogicalId(),$cmd->getName(),$value);
+				log::add(__CLASS__,'debug',$log);
 				$cmd->event($value,null,0);
 				return $changed;
 			}
