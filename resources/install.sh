@@ -1,5 +1,5 @@
 FILENAME="$2/dependancy_kkasa_in_progress"
-REQ_VERSION="2.3.1"
+REQ_VERSION="2.3.2"
 echo "Destination is $1"
 echo "Tmp folder is $2"
 touch ${FILENAME}

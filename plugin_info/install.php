@@ -24,6 +24,7 @@ function kkasa_install() {
   // kkasa_update();
   config::save('cron_freq', '15','kkasa');
   config::save('cloud', '0','kkasa');
+  config::save('offline_log', 'debug','kkasa');
   config::save('version',KKASA_VERSION,'kkasa');
 }
 

@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.3.1');
+define('KKPA_MIN_VERSION','2.3.2');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -1049,6 +1049,27 @@ class kkasa extends eqLogic {
 		{
 			$cmd = $this->getCmd(null,$cmd_name);
 			if (is_object($cmd)) {
+				$maxValue = $cmd->getConfiguration('maxValue',false);
+				if ($maxValue!==false)
+				{
+					if ($value > $maxValue)
+					{
+						$logstr = '[%s$1] %s$2 value(%f$3) > maxValue(%f$4)';
+						$log = sprintf($logstr,$this->getLogicalId(),$cmd_name,$value,$maxValue);
+						log::add(__CLASS__,'error',$log);
+						return false;
+					}
+				}
+				$minValue = $cmd->getConfiguration('minValue',false);
+				if ($minValue!==false)
+				{
+					if ($value < $minValue)
+					{
+						$logstr = '[%s$1] %s$2 value(%f$3) < minValue(%f$4)';
+						$log = sprintf($logstr,$this->getLogicalId(),$cmd_name,$value,$minValue);
+						return false;
+					}
+				}
 				$cmd->refresh();
 				$changed = $this->checkAndUpdateCmd($cmd_name, $value);
 				$logstr = '[%1$s] set: %2$s to %3$s';
