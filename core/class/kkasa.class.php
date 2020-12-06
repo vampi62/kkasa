@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.3.2');
+define('KKPA_MIN_VERSION','2.3.3');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -145,7 +145,7 @@ class kkasa extends eqLogic {
 						$this->_device = $client->getDeviceByIp($local_ip,$local_port,$this->getConfiguration('child_id'));
 					} catch (KKPA\Exceptions\KKPAClientException $ex) {
 						if ($ex->getCode()==KKPA_NO_ROUTE_TO_HOST) {
-							log::add('kkasa','Info',"Cannot reach $local_ip. Trying to autodetect IP of ".$this->getLogicalId());
+							log::add(__CLASS__,'Info',"Cannot reach $local_ip. Trying to autodetect IP of ".$this->getLogicalId());
 							try {
 								$this->_device = $client->getDeviceById(
 									$this->getConfiguration('deviceId'),
@@ -154,7 +154,7 @@ class kkasa extends eqLogic {
 								if (is_object($this->_device)) {
 									$local_ip = $this->_device->getVariable('local_ip','');
 									$port_ip = intval($this->_device->getVariable('local_port',9999));
-									log::add('kkasa','Info',"IP found: $local_ip. Updating");
+									log::add(__CLASS__,'Info',"IP found: $local_ip. Updating");
 									if ($local_ip!='') {
 										$this->setConfiguration("local_ip",$local_ip);
 										$this->setConfiguration("local_port",$local_port);
@@ -181,7 +181,8 @@ class kkasa extends eqLogic {
 			if (is_null($this->_device))
 				$this->setInfo('offline',1);
 			else {
-				$this->setInfo('offline',0);
+				if ($this->getInfo('offline',-1)!=0)
+					$this->setInfo('offline',0);
 			}
 			return $this->_device;
 		}
@@ -477,13 +478,15 @@ class kkasa extends eqLogic {
 
 	  			$eqLogic = kkasa::byLogicalId($eqLogicalId, __CLASS__);
 	  			if (!is_object($eqLogic)) {
+						log::add(__CLASS__, 'debug',"$eqLogicalId found and will be added");
+						log::add(__CLASS__, 'debug',print_r($sysinfo,true));
 	  				$eqLogic = new self();
-	                  foreach (jeeObject::all() as $object) {
-	                      if (stristr($alias,$object->getName())){
-	                          $eqLogic->setObject_id($object->getId());
-	                          break;
-	                      }
-	                  }
+            foreach (jeeObject::all() as $object) {
+                if (stristr($alias,$object->getName())){
+                    $eqLogic->setObject_id($object->getId());
+                    break;
+                }
+            }
 	  				$eqLogic->setLogicalId($eqLogicalId);
 	  				$eqLogic->setName($alias);
 						$eqLogic->setConfiguration('deviceId', $deviceId);
@@ -537,23 +540,21 @@ class kkasa extends eqLogic {
 
 		public function syncRealTime()
 		{
+			log::add(
+				__CLASS__,
+				'debug',
+				'Processing refresh of '
+					.$this->getLogicalId()
+			);
 			$attempt = 0;
 			$success = false;
 			$changed = false;
 			$device = $this->getDevice();
 			if (is_null($device))
 			{
-				log::add(__CLASS__, 'debug', "ERROR device is null on line ".__LINE__);
+				log::add(__CLASS__, 'error', "ERROR device is null on line ".__LINE__);
 				throw new Exception("Device is null");
 			}
-			log::add(
-				__CLASS__,
-				'debug',
-				'Processing refresh of '
-					.$this->getLogicalId()
-					// $device->getVariable('deviceId','')
-					// .$device->getVariable('child_id','')
-			);
 			while((!$success) && $attempt < 3)
 			{
 				try
