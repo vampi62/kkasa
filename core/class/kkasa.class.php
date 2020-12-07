@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.3.3');
+define('KKPA_MIN_VERSION','2.3.4');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -283,10 +283,13 @@ class kkasa extends eqLogic {
    		$return['progress_file'] =  jeedom::getTmpFolder(__CLASS__) . '/dependancy_kkasa_in_progress';
    		if (file_exists(__DIR__.'/../../3rparty/KKPA/Clients/KKPAApiClient.php')) {
 				try {
-					if (version_compare(KKPA\Clients\KKPAApiClient::getVersion(),KKPA_MIN_VERSION,'<'))
+					$cur_ver = KKPA\Clients\KKPAApiClient::getVersion();
+					$req_ver = KKPA_MIN_VERSION;
+					if (version_compare($cur_ver,$req_ver,'<'))
 					{
+						$logstr = __('[Dep] Nouvelle version des dépendance requise(%s$1 < %s$2). Merci de réinstaller les dépendances de kkasa',__FILE__);
 						log::add(__CLASS__,'error',
-							__('[Dep] Nouvelle version des dépendance requise. Merci de réinstaller les dépendances de kkasa',__FILE__)
+							sprintf($logstr,$cur_ver,$req_ver)
 						);
 		   			$return['state'] = 'nok';
 					} else
