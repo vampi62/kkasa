@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.3.4');
+define('KKPA_MIN_VERSION','2.3.5');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -287,7 +287,7 @@ class kkasa extends eqLogic {
 					$req_ver = KKPA_MIN_VERSION;
 					if (version_compare($cur_ver,$req_ver,'<'))
 					{
-						$logstr = __('[Dep] Nouvelle version des dépendance requise(%s$1 < %s$2). Merci de réinstaller les dépendances de kkasa',__FILE__);
+						$logstr = __('[Dep] Nouvelle version des dépendance requise(%s < %s). Merci de réinstaller les dépendances de kkasa',__FILE__);
 						log::add(__CLASS__,'error',
 							sprintf($logstr,$cur_ver,$req_ver)
 						);
