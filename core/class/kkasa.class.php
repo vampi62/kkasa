@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.3.5');
+define('KKPA_MIN_VERSION','2.3.6');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -237,16 +237,16 @@ class kkasa extends eqLogic {
  		 		self::cronExec();
 
 		 // Once a day: update the firmware version
- 		 foreach (self::byType('kkasa') as $kkasa) {
- 			 if ($kkasa->getIsEnable())
+ 		 foreach (self::byType(__CLASS__) as $eqLogic) {
+ 			 if ($eqLogic->getIsEnable())
  			 {
-				 	$device = $kkasa->getDevice();
+				 	$device = $eqLogic->getDevice();
  					$sysinfo = $device->getSysInfo();
- 					$kkasa->setConfiguration('sw_ver', $sysinfo['sw_ver']);
- 					$kkasa->setConfiguration('fwId', $sysinfo['fwId']);
- 					$kkasa->setConfiguration('oemId', $sysinfo['oemId']);
-					$kkasa->setConfiguration('features',$kkasa->featureString());
- 					$kkasa->save();
+ 					$eqLogic->setConfiguration('sw_ver', $sysinfo['sw_ver']);
+ 					$eqLogic->setConfiguration('fwId', $sysinfo['fwId']);
+ 					$eqLogic->setConfiguration('oemId', $sysinfo['oemId']);
+					$eqLogic->setConfiguration('features',$eqLogic->featureString());
+ 					$eqLogic->save();
  			 }
  		 }
 		}
@@ -271,7 +271,13 @@ class kkasa extends eqLogic {
 				} else {
 					throw $ex;
 				}
-			 }
+			} catch (KKPA\Exceptions\KKPAApiErrorType $ex)
+			{
+				if ($ex->getCode() == KKPA_MISSING_DEVICEID)
+				{
+					log::add(__CLASS__,$log_level,sprintf("Missing or incorrect format for deviceId for %s",$kkasa->_device->toString()));
+				}
+			}
 		 }
 	 }
 
