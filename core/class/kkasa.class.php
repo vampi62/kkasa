@@ -273,10 +273,12 @@ class kkasa extends eqLogic {
 				}
 			} catch (KKPA\Exceptions\KKPAApiErrorType $ex)
 			{
+				log::add(__CLASS__,'debug',sprintf("Exception code is %s",$ex->getCode()));
+				log::add(__CLASS__,'debug',sprintf("KKPA_MISSING_DEVICEID is %s",KKPA_MISSING_DEVICEID));
 				if ($ex->getCode() == KKPA_MISSING_DEVICEID)
 				{
 					$device = $kkasa->getDevice();
-					log::add(__CLASS__,$log_level,sprintf("Missing or incorrect format for deviceId for %s",$device->toString()));
+					log::add(__CLASS__,'error',sprintf("Missing or incorrect format for deviceId of %s",$device->toString()));
 				} else {
 					throw $ex;
 				}
