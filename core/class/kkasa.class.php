@@ -261,7 +261,7 @@ class kkasa extends eqLogic {
 				 }
 			 } catch(KKPA\Exceptions\KKPADeviceException $ex)
 			 {
-				 if ($ex->getCode() == KKPA_DEVICE_OFFLINE || $ex->getCode() == KKPA_TIMEOUT)
+				 if ($ex->getCode() == KKPA\Exceptions\KKPA_DEVICE_OFFLINE || $ex->getCode() == KKPA\Exceptions\KKPA_TIMEOUT)
 				{
 					$log_level = config::byKey('offline_log', __CLASS__,'error');
 					if ($log_level!='error')
@@ -273,9 +273,12 @@ class kkasa extends eqLogic {
 				}
 			} catch (KKPA\Exceptions\KKPAApiErrorType $ex)
 			{
-				if ($ex->getCode() == KKPA_MISSING_DEVICEID)
+				if ($ex->getCode() == KKPA\Exceptions\KKPA_MISSING_DEVICEID)
 				{
-					log::add(__CLASS__,$log_level,sprintf("Missing or incorrect format for deviceId for %s",$kkasa->_device->toString()));
+					$device = $kkasa->getDevice();
+					log::add(__CLASS__,$log_level,sprintf("Missing or incorrect format for deviceId for %s",$device->toString()));
+				} else {
+					throw $ex;
 				}
 			}
 		 }
