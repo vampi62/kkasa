@@ -60,7 +60,8 @@ class kkasa extends eqLogic {
         self::$_client =  new KKPA\Clients\KKPAApiClient(array(
           'username' => config::byKey('username', __CLASS__),
           'password' => config::byKey('password', __CLASS__),
-          'cloud' => config::byKey('cloud', __CLASS__),
+          'cloud' 	 => config::byKey('cloud', __CLASS__),
+          'base_uri' => config::byKey('base_uri', __CLASS__)
         ));
       }
 			if (config::byKey('cloud', __CLASS__)==1) {
@@ -84,7 +85,8 @@ class kkasa extends eqLogic {
 				'password' 		=> (config::byKey('password', __CLASS__)) ? '***' : 'Undefined',
 				'cloud' 			=> config::byKey('cloud', __CLASS__),
 				'cron_freq' 	=> config::byKey('cron_freq', __CLASS__),
-				'offline_log' => config::byKey('offline_log', __CLASS__)
+				'offline_log' => config::byKey('offline_log', __CLASS__),
+				'base_uri' 		=> config::byKey('base_uri', __CLASS__)
 			);
   		log::add(__CLASS__, 'debug', '*** Conf:');
   		log::add(__CLASS__, 'debug', print_r($conf,true));
@@ -576,7 +578,12 @@ class kkasa extends eqLogic {
 		      $sysinfo = $device->getSysInfo();
 					$this->refresh();
 					$changed = $this->setInfo('state',$device->getState()) || $changed;
-					$changed = $this->setInfo('rssi',$sysinfo['rssi']) || $changed;
+					$rssi = intval($sysinfo['rssi']);
+					if ($rssi <= -30 && $rssi >= -90)
+						$changed = $this->setInfo('rssi',$sysinfo['rssi']) || $changed;
+					else {
+						log::add(__CLASS__,'debug','[%1] incorrect rssi value: "%2" ==> ignored');
+					}
 					if ($device->is_featured('LED'))
 						$changed = $this->setInfo('ledState',(!$sysinfo['led_off'])) || $changed;
 					$this->setConfiguration('sw_ver', $sysinfo['sw_ver']);

@@ -84,5 +84,16 @@ $(".configKey[data-l1key='cloud']")
     						</select>
             </div>
         </div>
+        <?php
+  			if (intval(log::getLogLevel('kkasa')) <=100)
+  			{
+  				?>
+      	<div class="form-group">
+            <label class="col-sm-4 control-label">{{URI Kasa}}<br /><span style="color:red">{{Modifications à vos risques et périls}}</span></label>
+            <div class="col-lg-2">
+                <input class="configKey form-control" data-l1key="base_uri" />
+            </div>
+        </div>
+      <?php } ?>
   </fieldset>
 </form>

@@ -23,4 +23,5 @@ require_once __DIR__  . '/../../../../core/php/core.inc.php';
  *
  *
  */
-define('KKASA_VERSION','2.4.3');
+define('KKASA_VERSION','2.4.4');
+define('KKASA_BASE_URI',"https://wap.tplinkcloud.com/");

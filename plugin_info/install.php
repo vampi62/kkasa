@@ -26,6 +26,7 @@ function kkasa_install() {
   config::save('cloud', '0','kkasa');
   config::save('offline_log', 'debug','kkasa');
   config::save('version',KKASA_VERSION,'kkasa');
+  config::save('base_uri', KKASA_BASE_URI,'kkasa');
 }
 
 function kkasa_update() {
@@ -93,6 +94,14 @@ function kkasa_update() {
       {
         $changed = $eqLogic->setLogicalId($eqLogic->getConfiguration('child_id','')) || $changed;
       }
+    }
+  }
+
+  if (version_compare($kkasa_version,'2.4.4','<'))
+  {
+    if (config::byKey('base_uri', 'kkasa','-1')=='-1')
+    {
+      config::save('base_uri', KKASA_BASE_URI,'kkasa');
     }
   }
 
