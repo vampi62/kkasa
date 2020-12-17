@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.3.7');
+define('KKPA_MIN_VERSION','2.3.8');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -106,7 +106,8 @@ class kkasa extends eqLogic {
 					);
 					$device->getSysInfo();
 		  		log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
-					if (!is_null($device->getRealTime()))
+					$getRealTime = $device->getRealTime();
+					if (!is_null($getRealTime) && count($getRealTime)>0)
 		  			log::add(__CLASS__, 'debug', print_r($device->debug_last_request(),true));
 				} catch (KKPA\Exceptions\KKPASDKException $ex)
 				{
@@ -242,7 +243,7 @@ class kkasa extends eqLogic {
  		 foreach (self::byType(__CLASS__) as $eqLogic) {
  			 if ($eqLogic->getIsEnable())
  			 {
-				 	$device = $eqLogic->getDevice();
+				 	$device = $eqLogic->getDevice(); //TODO: catch bind or connection error
  					$sysinfo = $device->getSysInfo();
  					$eqLogic->setConfiguration('sw_ver', $sysinfo['sw_ver']);
  					$eqLogic->setConfiguration('fwId', $sysinfo['fwId']);
@@ -277,7 +278,7 @@ class kkasa extends eqLogic {
 			{
 				log::add(__CLASS__,'debug',sprintf("Exception code is %s",$ex->getCode()));
 				log::add(__CLASS__,'debug',sprintf("KKPA_MISSING_DEVICEID is %s",KKPA_MISSING_DEVICEID));
-				if ($ex->getCode() == KKPA_MISSING_DEVICEID)
+				if ($ex->getCode() == KKPA_MISSING_DEVICEID) //TODO: Catch not bind device
 				{
 					$device = $kkasa->getDevice();
 					log::add(__CLASS__,'error',sprintf("Missing or incorrect format for deviceId of %s",$device->toString()));
