@@ -19,7 +19,7 @@
 /* * ***************************Includes********************************* */
 define('TEST_FILE',__DIR__.'/../../3rparty/KKPA/autoload.php');
 define('KKASA_HSLCOLOR_LIB',__DIR__.'/../../3rparty/HSLColor/HSLColor.class.php');
-define('KKPA_MIN_VERSION','2.3.9');
+define('KKPA_MIN_VERSION','2.3.10');
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
 require_once __DIR__  . '/../php/kkasa.inc.php';
 
@@ -94,7 +94,7 @@ class kkasa extends eqLogic {
   		$devicelist = $client->getDeviceList();
   		log::add(__CLASS__, 'debug', $client->toString());
   		log::add(__CLASS__, 'debug', '*** DeviceList:');
-  		log::add(__CLASS__, 'debug', print_r($client->debug_last_request(),true));
+  		//log::add(__CLASS__, 'debug', print_r($client->debug_last_request(),true));
   		foreach ($devicelist as $device) {
 				try {
 					log::add(
@@ -549,6 +549,8 @@ class kkasa extends eqLogic {
 								.$device->getVariable('child_id','')
 							)
 						);
+					} else {
+						log::add(__CLASS__,"error",sprintf("[%s] %s",$device->getVariable('deviceId',''),print_r($device->debug_last_request(),true)));
 					}
 				}
 	  	}
