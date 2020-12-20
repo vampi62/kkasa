@@ -88,7 +88,7 @@ $(".configKey[data-l1key='cloud']")
   			if (intval(log::getLogLevel('kkasa')) <=100)
   			{
   				?>
-      	<div class="form-group">
+      	<div class="form-group kkasa-only-cloud">
             <label class="col-sm-4 control-label">{{URI Kasa}}<br /><span style="color:red">{{Modifications à vos risques et périls}}</span></label>
             <div class="col-lg-2">
                 <input class="configKey form-control" data-l1key="base_uri" />
