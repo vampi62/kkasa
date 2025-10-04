@@ -201,6 +201,48 @@ $('#btDeleteAll').on('click', function () {
     });
 });
 
+$('#btAddByIp').on('click', function(){
+    bootbox.prompt("{{Adresse IP de la prise ?}}", function(ip){
+        if(ip == null){
+            return;
+        }
+        // preg_match IP (simplified)
+        let regex = /^(\d{1,3}\.){3}\d{1,3}$/;
+        if(!regex.test(ip)){
+            $('#div_alert').showAlert({message: '{{Adresse IP incorrecte}}', level: 'danger'});
+            return;
+        }
+        $.ajax({// fonction permettant de faire de l'ajax
+            type: "POST", // methode de transmission des données au fichier php
+            url: "plugins/kkasa/core/ajax/kkasa.ajax.php", // url du fichier php
+            data: {
+                action: "addByIp",
+                ip: ip,
+            },
+            dataType: 'json',
+            error: function (request, status, error) {
+                handleAjaxError(request, status, error);
+            },
+            success: function (data) { // si l'appel a bien fonctionné
+                if (data.state != 'ok') {
+                    $('#div_alert').showAlert({message: data.result, level: 'danger'});
+                    return;
+                }
+                $('#div_alert').showAlert({message: '{{Equipement ajouté, merci de rafraichir la page}}', level: 'success'});
+                let vars = getUrlVars();
+                let url = 'index.php?';
+                for (var i in vars) {
+                    if (i != 'id' && i != 'saveSuccessFull' && i != 'removeSuccessFull') {
+                        url += i + '=' + vars[i].replace('#', '') + '&';
+                    }
+                }
+                url += 'syncedDevices=1';
+                loadPage(url);
+            }
+          });
+    });
+});
+
 $('.bt_kkasaCreateCmd').on('click', function () {
   var cmdType = $(this).attr("dataCmdType");
   var dialog_title = '{{Recharge configuration}}';

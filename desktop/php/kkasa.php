@@ -37,6 +37,14 @@ foreach ($eqLogics as $eqLogic) {
     		<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676">{{Configuration}}</span>
   		</div>
 			<?php
+			if (config::byKey('cloud', 'kkasa') != 1) {
+			?>
+				<div class="cursor eqLogicAction" id="btAddByIp" style="text-align: center; background-color : #ffffff; height : 120px;margin-bottom : 10px;padding : 5px;border-radius: 2px;width : 160px;margin-left : 10px;">
+					<i class="fa fa-plus-circle" style="font-size : 6em;color:#767676;"></i>
+					<br />
+					<span style="font-size : 1.1em;position:relative; top : 15px;word-break: break-all;white-space: pre-wrap;word-wrap: break-word;color:#767676">{{Ajouter équipement par IP}}</span>
+				</div>
+			<?php }
 			if (intval(log::getLogLevel('kkasa')) <=100)
 			{
 				?>
@@ -128,6 +136,21 @@ foreach ($eqLogics as $eqLogic) {
 					        </div>
 					    </div>
 							<?php
+							if (config::byKey('cloud', 'kkasa') != 1) {
+							?>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">{{Local IP}}</label>
+									<div class="col-sm-6">
+											<input class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="local_ip"/>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-3 control-label">{{Local port}}</label>
+									<div class="col-sm-6">
+											<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="local_port"/>
+									</div>
+								</div>
+							<?php }
 							if (intval(log::getLogLevel('kkasa')) <=100)
 							{
 								?>
@@ -147,18 +170,6 @@ foreach ($eqLogics as $eqLogic) {
 								 <label class="col-sm-3 control-label">{{Type}}</label>
 								 <div class="col-sm-6">
 										<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="type"/>
-								 </div>
-							</div>
-							<div class="form-group">
-								 <label class="col-sm-3 control-label">{{Local IP}}</label>
-								 <div class="col-sm-6">
-										<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="local_ip"/>
-								 </div>
-							</div>
-							<div class="form-group">
-								 <label class="col-sm-3 control-label">{{Local port}}</label>
-								 <div class="col-sm-6">
-										<input disabled class="eqLogicAttr configuration form-control" data-l1key="configuration" data-l2key="local_port"/>
 								 </div>
 							</div>
 							<div class="form-group">

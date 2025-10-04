@@ -556,6 +556,78 @@ class kkasa extends eqLogic {
 	  	}
 			return $nb_devices;
   	}
+	
+	public static function addDeviceByIp($ip) {
+		$client = self::getClient();
+		try {
+			$device = $client->getDeviceByIp($ip, 9999);
+			$sysinfo     = $device->getSysInfo();
+			$deviceId    = $sysinfo['deviceId'];
+			$alias       = $sysinfo['alias'];
+			$type  			 = $sysinfo['type'];
+			$fwVer			 = $sysinfo['sw_ver'];
+			$deviceName	 = $sysinfo['dev_name'];
+			$deviceModel = $sysinfo['model'];
+			$deviceMac	 = $sysinfo['mac'];
+			$hwId				 = $sysinfo['hwId'];
+			$fwId				 = $sysinfo['fwId'];
+			$oemId			 = $sysinfo['oemId'];
+			$deviceHwVer = $sysinfo['hw_ver'];
+
+			$eqLogic = kkasa::byLogicalId($deviceId, 'kkasa');
+			if (!is_object($eqLogic)) {
+				$eqLogic = new self();
+				foreach (jeeObject::all() as $object) {
+					if (stristr($alias, $object->getName())) {
+						$eqLogic->setObject_id($object->getId());
+						break;
+					}
+				}
+				$eqLogic->setLogicalId($deviceId);
+				$eqLogic->setName($alias);
+				$eqLogic->setConfiguration('type', $type);
+				$eqLogic->setConfiguration('sw_ver', $fwVer);
+				$eqLogic->setConfiguration('dev_name', $deviceName);
+				$eqLogic->setConfiguration('model', $deviceModel);
+				$eqLogic->setConfiguration('mac', $deviceMac);
+				$eqLogic->setConfiguration('hwId', $hwId);
+				$eqLogic->setConfiguration('fwId', $fwId);
+				$eqLogic->setConfiguration('oemId', $oemId);
+				$eqLogic->setConfiguration('hw_ver', $deviceHwVer);
+				if ($device->getVariable('local_ip', '') != '') {
+					$eqLogic->setConfiguration(
+						'local_ip',
+						$device->getVariable('local_ip', $ip)
+					);
+					$eqLogic->setConfiguration(
+						'local_port',
+						$device->getVariable('local_port', 9999)
+					);
+				}
+
+				$eqLogic->setEqType_name('kkasa');
+				$eqLogic->setIsVisible(1);
+				$eqLogic->setIsEnable(1);
+				$eqLogic->save();
+				$eqLogic->refreshWidget();
+				return $eqLogic;
+			} else {
+				log::add(__CLASS__, 'debug', "$deviceId found but already known");
+			}
+		} catch (KKPA\Exceptions\KKPADeviceException $ex) {
+			if ($ex->getCode() == KKPA_DEVICE_OFFLINE || $ex->getCode() == KKPA_TIMEOUT) {
+				log::add(
+					__CLASS__,
+					'warning',
+					sprintf(
+						__('Equipement %s trouvé mais injoignable. Ignoré', __FILE__),
+						$device->getVariable('deviceId', '')
+					)
+				);
+			}
+		}
+	}
+
 
 		public function syncRealTime()
 		{
@@ -956,7 +1028,7 @@ class kkasa extends eqLogic {
 		}
 
 		public function getImage() {
-			return 'plugins/kkasa/docs/assets/images/' . $this->getImgFilePath();
+			return 'plugins/kkasa/data/img/' . $this->getImgFilePath();
 		}
 
     /*     * *********************Méthodes d'instance************************* */
